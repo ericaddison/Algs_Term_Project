@@ -18,7 +18,7 @@ import audioCompression.types.RawAudio;
  * <li> serialization</li>
  * </ul>
  * 
- * @author eyms
+ * @author Eric Addison, Taylor Autry, Josh Musick
  *
  */
 public class StrippedDownMP3 implements AudioCompressor{
