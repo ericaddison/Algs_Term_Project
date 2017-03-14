@@ -1,5 +1,5 @@
 package audioCompression.types;
 
-public class EncodedLines {
+public class EncodedLines implements AudioCompressionType {
 
 }

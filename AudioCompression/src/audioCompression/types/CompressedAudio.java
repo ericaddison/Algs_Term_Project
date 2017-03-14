@@ -1,5 +1,5 @@
 package audioCompression.types;
 
-public class CompressedAudio {
+public class CompressedAudio implements AudioCompressionType {
 
 }

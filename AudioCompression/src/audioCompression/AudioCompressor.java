@@ -1,9 +1,9 @@
 package audioCompression;
 
-import audioCompression.blocks.BitstreamFormatter;
-import audioCompression.blocks.FilterBank;
-import audioCompression.blocks.HuffmanEncoder;
-import audioCompression.blocks.MDCT;
+import audioCompression.algorithm.BitstreamFormatterStep;
+import audioCompression.algorithm.FilterBankStep;
+import audioCompression.algorithm.HuffmanEncoderStep;
+import audioCompression.algorithm.MdctStep;
 import audioCompression.types.CompressedAudio;
 import audioCompression.types.EncodedLines;
 import audioCompression.types.Lines;
@@ -12,10 +12,10 @@ import audioCompression.types.Subbands;
 
 public class AudioCompressor {
 
-	private FilterBank filterbank = new FilterBank();
-	private MDCT mdct = new MDCT();
-	private HuffmanEncoder huffman = new HuffmanEncoder();
-	private BitstreamFormatter bitstreamF = new BitstreamFormatter();
+	private FilterBankStep filterbank = new FilterBankStep();
+	private MdctStep mdct = new MdctStep();
+	private HuffmanEncoderStep huffman = new HuffmanEncoderStep();
+	private BitstreamFormatterStep bitstreamF = new BitstreamFormatterStep();
 	
 	public CompressedAudio compress(RawAudio input){
 		Subbands subbands = filterbank.forward(input);

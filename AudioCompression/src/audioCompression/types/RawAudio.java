@@ -1,5 +1,5 @@
 package audioCompression.types;
 
-public class RawAudio {
+public class RawAudio implements AudioCompressionType {
 
 }
