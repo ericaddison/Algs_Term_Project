@@ -1,10 +1,6 @@
 package audioCompression.compressors;
 
-import audioCompression.algorithm.BitstreamFormatterStep;
-import audioCompression.algorithm.CompressionPipeline;
-import audioCompression.algorithm.FilterBankStep;
-import audioCompression.algorithm.HuffmanEncoderStep;
-import audioCompression.algorithm.MdctStep;
+import audioCompression.algorithm.*;
 import audioCompression.types.CompressedAudio;
 import audioCompression.types.RawAudio;
 
