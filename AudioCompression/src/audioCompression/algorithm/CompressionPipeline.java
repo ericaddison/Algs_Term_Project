@@ -27,7 +27,7 @@ public class CompressionPipeline {
 	 * @throws IllegalArgumentException thrown for input/output mismatch
 	 */
 	public boolean addStep(AlgorithmStep newStep){
-		if(checkStep(pipeline.getLast(), newStep))
+		if(checkStep(newStep))
 			return pipeline.add(newStep);
 		else
 			throw new IllegalArgumentException("CompressionPipeline: Attempted"
@@ -41,6 +41,7 @@ public class CompressionPipeline {
 	 * @param input the input data
 	 * @return the forward processed data
 	 */
+	@SuppressWarnings("unchecked")
 	public AudioCompressionType processForward(AudioCompressionType input){
 		if(input.getClass() != pipeline.getFirst().getInputClass())
 			throw new IllegalArgumentException("CompressionPipeline: Invalid "
@@ -49,7 +50,12 @@ public class CompressionPipeline {
 					+ ", got " + input.getClass());
 		
 		Iterator<AlgorithmStep> iter = pipeline.iterator();
-		return iterate(iter, input);
+		AudioCompressionType workingData = input;
+		while(iter.hasNext()){
+			AlgorithmStep nextStep = iter.next(); 
+			workingData = nextStep.forward(workingData);
+		}
+		return workingData;
 	}
 	
 
@@ -59,6 +65,7 @@ public class CompressionPipeline {
 	 * @param input the input data
 	 * @return the reverse processed data
 	 */
+	@SuppressWarnings("unchecked")
 	public AudioCompressionType processReverse(AudioCompressionType input){
 		if(input.getClass() != pipeline.getLast().getOutputClass())
 			throw new IllegalArgumentException("CompressionPipeline: Invalid "
@@ -67,28 +74,28 @@ public class CompressionPipeline {
 					+ ", got " + input.getClass());
 		
 		Iterator<AlgorithmStep> iter = pipeline.descendingIterator();
-		return iterate(iter, input);
-	}
-	
-	
-	// iterate through the pipeline operations using the provided iterator
-	@SuppressWarnings("unchecked")
-	private AudioCompressionType iterate(Iterator<AlgorithmStep> iter, 
-			AudioCompressionType input){
 		AudioCompressionType workingData = input;
 		while(iter.hasNext()){
 			AlgorithmStep nextStep = iter.next(); 
 			workingData = nextStep.reverse(workingData);
 		}
-		
 		return workingData;
 	}
 	
 	
+	/**
+	 * Get the current number of steps in the pipeline
+	 * @return # of steps
+	 */
+	public int getNumberOfSteps(){
+		return pipeline.size();
+	}
+	
+	
 	// Ensure a new step is valid to add to the end of the pipeline
-	private boolean checkStep(AlgorithmStep lastStep, AlgorithmStep newStep){
+	private boolean checkStep(AlgorithmStep newStep){
 		return pipeline.size()==0 
-				|| lastStep.getOutputClass()==newStep.getInputClass();
+			|| pipeline.getLast().getOutputClass()==newStep.getInputClass();
 	}
 	
 }
