@@ -659,6 +659,104 @@ public class WavFile
 	}
 
 
+	// Float
+	// Added by Eric Addison, 3/23/17
+	// ------
+	public int readFrames(float[] sampleBuffer, int numFramesToRead) throws IOException, WavFileException
+	{
+		return readFrames(sampleBuffer, 0, numFramesToRead);
+	}
+
+	public int readFrames(float[] sampleBuffer, int offset, int numFramesToRead) throws IOException, WavFileException
+	{
+		if (ioState != IOState.READING) throw new IOException("Cannot read from WavFile instance");
+
+		for (int f=0 ; f<numFramesToRead ; f++)
+		{
+			if (frameCounter == numFrames) return f;
+
+			for (int c=0 ; c<numChannels ; c++)
+			{
+				sampleBuffer[offset] = (float) (floatOffset + readSample() / floatScale);
+				offset ++;
+			}
+
+			frameCounter ++;
+		}
+
+		return numFramesToRead;
+	}
+
+	public int readFrames(float[][] sampleBuffer, int numFramesToRead) throws IOException, WavFileException
+	{
+		return readFrames(sampleBuffer, 0, numFramesToRead);
+	}
+
+	public int readFrames(float[][] sampleBuffer, int offset, int numFramesToRead) throws IOException, WavFileException
+	{
+		if (ioState != IOState.READING) throw new IOException("Cannot read from WavFile instance");
+
+		for (int f=0 ; f<numFramesToRead ; f++)
+		{
+			if (frameCounter == numFrames) return f;
+
+			for (int c=0 ; c<numChannels ; c++) sampleBuffer[c][offset] = (float)(floatOffset + readSample() / floatScale);
+
+			offset ++;
+			frameCounter ++;
+		}
+
+		return numFramesToRead;
+	}
+
+	public int writeFrames(float[] sampleBuffer, int numFramesToWrite) throws IOException, WavFileException
+	{
+		return writeFrames(sampleBuffer, 0, numFramesToWrite);
+	}
+
+	public int writeFrames(float[] sampleBuffer, int offset, int numFramesToWrite) throws IOException, WavFileException
+	{
+		if (ioState != IOState.WRITING) throw new IOException("Cannot write to WavFile instance");
+
+		for (int f=0 ; f<numFramesToWrite ; f++)
+		{
+			if (frameCounter == numFrames) return f;
+
+			for (int c=0 ; c<numChannels ; c++)
+			{
+				writeSample((long) (floatScale * (floatOffset + sampleBuffer[offset])));
+				offset ++;
+			}
+
+			frameCounter ++;
+		}
+
+		return numFramesToWrite;
+	}
+
+	public int writeFrames(float[][] sampleBuffer, int numFramesToWrite) throws IOException, WavFileException
+	{
+		return writeFrames(sampleBuffer, 0, numFramesToWrite);
+	}
+
+	public int writeFrames(float[][] sampleBuffer, int offset, int numFramesToWrite) throws IOException, WavFileException
+	{
+		if (ioState != IOState.WRITING) throw new IOException("Cannot write to WavFile instance");
+
+		for (int f=0 ; f<numFramesToWrite ; f++)
+		{
+			if (frameCounter == numFrames) return f;
+
+			for (int c=0 ; c<numChannels ; c++) writeSample((long) (floatScale * (floatOffset + sampleBuffer[c][offset])));
+
+			offset ++;
+			frameCounter ++;
+		}
+
+		return numFramesToWrite;
+	}
+
+
 	public void close() throws IOException
 	{
 		// Close the input stream and set to null
