@@ -4,11 +4,13 @@ import java.util.Iterator;
 
 public interface RawAudio extends AudioCompressionType {
 
+	public long getSampleRate();
+	
 	public long getNSamples();
 	
 	public int getSamplesPerWindow();
 	
-	public int getWindowOverlap();
+	public float getWindowOverlap();
 	
 	/**
 	 * Get the raw audio buffer, cast to floats,

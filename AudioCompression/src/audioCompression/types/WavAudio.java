@@ -4,9 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 
-import edu.mines.jtk.mosaic.PlotFrame;
-import edu.mines.jtk.mosaic.PlotPanel;
-
 import libs.wavParser.WavFile;
 import libs.wavParser.WavFileException;
 
@@ -15,9 +12,10 @@ public class WavAudio implements RawAudio{
 	private WavFile wavFile;
 	private long nSamples;
 	private int samplesPerWindow;
-	private int windowOverlap;
+	private float windowOverlap;
 	
-	public WavAudio(File wavFileFile, int samplesPerWindow, int windowOverlap) {
+	
+	public WavAudio(File wavFileFile, int samplesPerWindow, float windowOverlap) {
 		try {
 			this.wavFile = WavFile.openWavFile(wavFileFile);
 		} catch (IOException | WavFileException e) {
@@ -26,10 +24,19 @@ public class WavAudio implements RawAudio{
 		
 		nSamples = wavFile.getNumChannels()*wavFile.getNumFrames();
 		this.samplesPerWindow = samplesPerWindow;
-		this.windowOverlap = windowOverlap;
 		if(samplesPerWindow%wavFile.getNumChannels() > 0)
 			throw new IllegalArgumentException("WavAudio: window size must be a multiple of" +
 					" the number of channels, in this case: " + wavFile.getNumChannels());
+		
+		this.windowOverlap = windowOverlap;
+		if(windowOverlap<0 || windowOverlap>1)
+			throw new IllegalArgumentException("WavAudio: window overlap must be a percentage value," +
+					" between 0 and 1");
+	}
+
+	@Override
+	public long getSampleRate(){
+		return wavFile.getSampleRate();
 	}
 	
 	@Override
@@ -43,7 +50,7 @@ public class WavAudio implements RawAudio{
 	}
 
 	@Override
-	public int getWindowOverlap() {
+	public float getWindowOverlap() {
 		return windowOverlap;
 	}
 
@@ -65,15 +72,4 @@ public class WavAudio implements RawAudio{
 		return null;
 	}
 	
-	public static void main(String[] args){
-		WavAudio wav = new WavAudio(new File("../src_wavs/nokia_tune.wav"), 120, 10);
-		float[] buff = wav.getAudioBuffer(0,100000);
-		System.out.println(wav.getNSamples());
-		
-		PlotFrame frame = new PlotFrame(new PlotPanel(1,1));
-		frame.getPlotPanel().addPoints(buff);
-		frame.setSize(500, 300);
-		frame.setVisible(true);
-	}
-
 }
