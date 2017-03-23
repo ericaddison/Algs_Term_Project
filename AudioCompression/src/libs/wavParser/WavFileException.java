@@ -1,4 +1,4 @@
-package wavParser;
+package libs.wavParser;
 
 public class WavFileException extends Exception
 {

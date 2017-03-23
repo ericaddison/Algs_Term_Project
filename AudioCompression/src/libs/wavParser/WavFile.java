@@ -1,4 +1,4 @@
-package wavParser;
+package libs.wavParser;
 
 
 //Wav file IO class
