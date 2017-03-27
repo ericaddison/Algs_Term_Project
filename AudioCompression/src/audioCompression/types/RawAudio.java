@@ -8,26 +8,28 @@ public interface RawAudio extends AudioCompressionType {
 	
 	public long getNSamples();
 	
-	public int getSamplesPerWindow();
+	public long getSamplesPerWindow();
+	
+	public long getNWindows();
 	
 	public float getWindowOverlap();
 	
+	public int getNChannels();
+	
 	/**
-	 * Get the raw audio buffer, cast to floats,
-	 * from sample samp1 to samp2. length of returned buffer
-	 * may vary from actual requested number of samples based
-	 * on implementation. Check return array length for
-	 * number of samples read. 
-	 * @param samp1
-	 * @param samp2
-	 * @return
+	 * Get the next N samples from the raw audio buffer
+	 * @param nsamples the number of audio samples to get
+	 * @return 2d array of size [nChannels][nsamples]
 	 */
-	public float[] getAudioBuffer(int samp1, int samp2);
+	public float[][] getAudioBuffer(int nsamples);
+	
+	public float[][][] getAllWindows();
+	
 	
 	/**
 	 * Get an iterator over the windows of samples 
 	 * @return
 	 */
-	public Iterator<float[]> getWindowIterator();
+	public Iterator<float[][]> getWindowIterator();
 	
 }
