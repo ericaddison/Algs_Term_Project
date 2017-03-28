@@ -12,7 +12,7 @@ public interface RawAudio extends AudioCompressionType {
 	
 	public long getNWindows();
 	
-	public float getWindowOverlap();
+	public int getWindowOverlap();
 	
 	public int getNChannels();
 	

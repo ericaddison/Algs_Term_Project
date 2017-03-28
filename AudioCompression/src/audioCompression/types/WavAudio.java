@@ -2,6 +2,7 @@ package audioCompression.types;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.NClob;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.function.Consumer;
@@ -15,11 +16,10 @@ public class WavAudio implements RawAudio{
 	private long nSamples;             // total number of samples (per channel) in the audio file 
 	private long nWindows;             // total number of windows (including the overlap)
 	private int samplesPerWindow;      // number of samples per window
-	private int windowOverlapSamples;  // number of samples in the window overlap
-	private float windowOverlap;       // percentage of window overlap
+	private int windowOverlap;       // percentage of window overlap
 	private File inputFile;
 	
-	public WavAudio(File inputFile, int samplesPerWindow, float windowOverlap) {
+	public WavAudio(File inputFile, int samplesPerWindow, int windowOverlap) {
 		try {
 			this.inputFile = inputFile;
 			this.wavFile = WavFile.openWavFile(inputFile);
@@ -28,14 +28,10 @@ public class WavAudio implements RawAudio{
 			this.samplesPerWindow = samplesPerWindow;
 			
 			this.windowOverlap = windowOverlap;
-			if(windowOverlap<0 || windowOverlap>=1)
-				throw new IllegalArgumentException("WavAudio: window overlap must be a percentage value," +
-						" in the interval [0,1)");
-			
+			if(windowOverlap>samplesPerWindow/2 || windowOverlap<0)
+				throw new IllegalArgumentException("WavAudio: require 0<=windowOverlap<=sampsPerWindow/2");			
 			// set up window information, using wav frame-based values as intermediate information
-			this.windowOverlapSamples = (int)(windowOverlap*samplesPerWindow);
-			this.windowOverlap = (float)(windowOverlapSamples)/samplesPerWindow;
-			this.nWindows = (wavFile.getNumFrames()-samplesPerWindow)/(samplesPerWindow-windowOverlapSamples) + 1;
+			this.nWindows = (wavFile.getNumFrames()-samplesPerWindow)/(samplesPerWindow-windowOverlap) + 1;
 		} catch (IOException | WavFileException e) {
 			e.printStackTrace();
 		} finally{
@@ -73,7 +69,7 @@ public class WavAudio implements RawAudio{
 	}
 
 	@Override
-	public float getWindowOverlap() {
+	public int getWindowOverlap() {
 		return windowOverlap;
 	}
 
@@ -111,7 +107,7 @@ public class WavAudio implements RawAudio{
 		while(iter.hasNext() && windowCount<nWindows){
 			float[][] nextWindow = iter.next();
 			for(int i=0; i<getNChannels(); i++)
-				allWindows[i][windowCount] = Arrays.copyOf(nextWindow[i], samplesPerWindow);
+				allWindows[i][windowCount] = nextWindow[i];
 			windowCount++;
 		}
 		return allWindows;
@@ -119,17 +115,17 @@ public class WavAudio implements RawAudio{
 
 	private class WindowIterator implements Iterator<float[][]>{
 		
-		private float[][] currentWindow;
+		private float[][] windowBuffer;
 		private int windowIncrement;
 		private WavFile myWavFile;
 		
 		public WindowIterator() {
 			try {
 				myWavFile = WavFile.openWavFile(inputFile);
-				currentWindow = new float[myWavFile.getNumChannels()][(int)samplesPerWindow];
-				windowIncrement = samplesPerWindow-windowOverlapSamples;
+				windowBuffer = new float[myWavFile.getNumChannels()][(int)samplesPerWindow];
+				windowIncrement = samplesPerWindow-windowOverlap;
 				// pre-populate window
-				myWavFile.readFrames(currentWindow, windowOverlapSamples, windowIncrement);
+				myWavFile.readFrames(windowBuffer, windowOverlap, windowIncrement);
 			} catch (IOException | WavFileException e) {
 				e.printStackTrace();
 			}
@@ -146,28 +142,21 @@ public class WavAudio implements RawAudio{
 				// shift data in current window
 				shiftWindow();
 				// read new frames
-				myWavFile.readFrames(currentWindow, windowOverlapSamples, windowIncrement);
-				return currentWindow;
+				myWavFile.readFrames(windowBuffer, windowOverlap, windowIncrement);
+				float[][] windowCopy = new float[getNChannels()][];
+				for(int i=0; i<windowCopy.length; i++)
+					windowCopy[i] = Arrays.copyOf(windowBuffer[i],windowBuffer[i].length);
+				return windowCopy;
 			} catch (IOException | WavFileException e) {
 				e.printStackTrace();
 			}
 			return null;
 		}
-
-		@Override
-		public void remove() {
-			throw new IllegalAccessError("Method not implemented");
-		}
-
-		@Override
-		public void forEachRemaining(Consumer<? super float[][]> action) {
-			throw new IllegalAccessError("Method not implemented");
-		}
 		
 		private void shiftWindow(){
 			for(int i=0; i<myWavFile.getNumChannels(); i++)
 				for(int j=0; j<windowIncrement; j++)
-					currentWindow[i][j] = currentWindow[i][(j+windowOverlapSamples)];
+					windowBuffer[i][j] = windowBuffer[i][(j+windowOverlap)];
 		}
 		
 	}
