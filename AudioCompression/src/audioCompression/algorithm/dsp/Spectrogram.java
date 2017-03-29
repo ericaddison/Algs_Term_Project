@@ -9,18 +9,17 @@ import audioCompression.algorithm.dsp.window.Window;
  */
 public class Spectrogram {
 
-	public Spectrogram(float[] input, int sampsPerWindow, Window w) {
+	public Spectrogram(float[] input, int sampleOverlap, Window w) {
 		
 	}
 	
 	
-	private float[][] STFT(Window w, float[] arr, ){
-		int N = arr.length;
-		int M = w.getLength();
-		
-		// get window scalar
+	private float[][] STFT(float[] arr, int sampleOverlap, Window w){
+		int N = arr.length;		// length of full array
+		int M = w.getLength();	// window length
 		
 		
+		return null;
 	}
 	
 }

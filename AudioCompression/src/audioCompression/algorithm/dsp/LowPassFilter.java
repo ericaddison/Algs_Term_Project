@@ -20,7 +20,7 @@ public class LowPassFilter {
 		coefficients = new float[N];
 		for(int i=0; i<N; i++)
 			coefficients[i] = (float)sinc( 2.0f*(i-N/2)*cutoff );
-		w.apply(coefficients);
+		coefficients = w.apply(coefficients);
 	}
 	
 	public float[] getCoefficients(){

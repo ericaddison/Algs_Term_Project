@@ -27,20 +27,20 @@ public abstract class Window {
 		return N;
 	}
 
-	public void apply(float[] in) {
-		apply(in, 1.0f);
-	}
-
 	public float[] getCoefficients() {
 		return coefficients;
 	}
+	
+	public float[] apply(float[] in) {
+		return apply(in, 1.0f, 0);
+	}
+	
+	public float[] apply(float[] in, int offset) {
+		return apply(in, 1.0f, offset);
+	}
 
-	public void applyNormalized(float[] in) {
-		float oldNorm = norm;
-		if(in.length != N)
-			norm = computeNorm();
-		apply(in, norm);
-		norm = oldNorm;
+	public float[] applyNormalized(float[] in, int offset) {
+		return apply(in, norm, offset);
 	}
 	
 	private float computeNorm() {
@@ -50,16 +50,11 @@ public abstract class Window {
 		return norm;
 	}
 
-	private void apply(float[] in, float fac){
-		int oldN = N;
-		if(in.length != N){
-			N = in.length;
-			for(int i=0; i<N; i++)
-				in[i] *= eval(i);
-		} else
-			for(int i=0; i<N; i++)
-				in[i] *= fac*coefficients[i];
-		N = oldN;
+	private float[] apply(float[] in, float fac, int offset){
+		float[] applied = new float[N];
+		for(int i=0; i<N; i++)
+			applied[i] = in[i+offset]*fac*coefficients[i];
+		return applied;
 	}
 	
 }
