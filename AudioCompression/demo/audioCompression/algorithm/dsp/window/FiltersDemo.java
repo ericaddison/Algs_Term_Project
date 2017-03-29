@@ -4,13 +4,15 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+import audioCompression.algorithm.dsp.LowPassFilter;
+
 import edu.mines.jtk.mosaic.GridView;
 import edu.mines.jtk.mosaic.GridView.Style;
 import edu.mines.jtk.mosaic.PlotFrame;
 import edu.mines.jtk.mosaic.PlotPanel;
 import edu.mines.jtk.mosaic.PointsView;
 
-public class WindowsDemo {
+public class FiltersDemo {
 
 	private static Color[] colors = new Color[] 
 			{
@@ -24,28 +26,29 @@ public class WindowsDemo {
 	
 	public static void main(String args[]){
 		
-		List<Window> windows = new ArrayList<>();
-		int N = (int)Math.pow(2, 11);
-		windows.add(new HammingWindow(N));
-		windows.add(new HannWindow(N));
-		windows.add(new BlackmannWindow(N));
-		windows.add(new KaiserWindow(N, 0.003f));
+		List<LowPassFilter> filters = new ArrayList<>();
+		int N = (int)Math.pow(2, 9);
+		
+		float cutoff = 0.1f;
+		filters.add(new LowPassFilter(cutoff, new HammingWindow(N)));
+		filters.add(new LowPassFilter(cutoff, new HannWindow(N)));
+		filters.add(new LowPassFilter(cutoff, new BlackmannWindow(N)));
+		filters.add(new LowPassFilter(cutoff, new KaiserWindow(N, 5.0f/N)));
 		
 		PlotFrame f1 = new PlotFrame(new PlotPanel(1,1));
 		List<float[]> data = new ArrayList<>();
 		
-		for(Window w : windows){
-			data.add(w.getCoefficients());
-			PointsView pv = f1.getPlotPanel().addPoints(w.getCoefficients());
-			pv.setLineColor(colors[windows.indexOf(w)%windows.size()]);
+		for(LowPassFilter f : filters){
+			data.add(f.getCoefficients());
+			PointsView pv = f1.getPlotPanel().addPoints(f.getCoefficients());
+			pv.setLineColor(colors[filters.indexOf(f)%filters.size()]);
 		}
 
 		GridView gv = f1.getPlotPanel().addGrid();
 		gv.setColor(Color.LIGHT_GRAY);
 		gv.setStyle(Style.DASH);
-		
+
 		PlotFrame f2 = new TwoSidedFftDbPlot(N, data);
-		
 		f1.setSize(500, 300);
 		f1.setDefaultCloseOperation(PlotFrame.EXIT_ON_CLOSE);
 		f1.setVisible(true);

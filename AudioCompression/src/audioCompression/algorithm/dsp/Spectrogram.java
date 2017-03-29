@@ -13,4 +13,14 @@ public class Spectrogram {
 		
 	}
 	
+	
+	private float[][] STFT(Window w, float[] arr, ){
+		int N = arr.length;
+		int M = w.getLength();
+		
+		// get window scalar
+		
+		
+	}
+	
 }
