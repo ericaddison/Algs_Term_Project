@@ -23,17 +23,27 @@ public class RawAudioImpl implements RawAudio{
 		if(windowOverlap>sampsPerWindow/2 || windowOverlap<0)
 			throw new IllegalArgumentException("RawAudioImpl: require 0<=windowOverlap<=sampsPerWindow/2");
 		this.sampsPerWindow = sampsPerWindow;
-		this.overlap = overlap;
+		this.overlap = windowOverlap;
 		this.windowIncrement = (sampsPerWindow-windowOverlap);
 		this.nwindows = nSamps/windowIncrement;
 		
 		
 		buffer = new float[2][nSamps];
-		float f0 = 0.001f;
-		float df = 0.000025f;
-		for(int i=0; i<nSamps; i++){
-			buffer[0][i] = (float)Math.sin(2*Math.PI*(f0+i*df)*i);
-			buffer[1][i] = (float)Math.cos(2*Math.PI*(f0+i*df)*i);
+		float f0 = 0.0f;
+		float df = 2*0.3f/nSamps;
+		float f = 0;
+		int nDivs = 6;
+		
+		for(int i=0; i<nSamps/nDivs; i++){
+			for(int j=0; j<nDivs/2; j++){
+				float ch1 = (float)Math.sin(2*Math.PI*i*(f0+f));
+				float ch2 = (float)Math.cos(2*Math.PI*i*(f0+f));
+				buffer[0][i+2*j*nSamps/nDivs] = ch1;
+				buffer[1][i+2*j*nSamps/nDivs] = ch2;
+				buffer[0][nSamps-(i+2*j*nSamps/nDivs)-1] = ch1;
+				buffer[1][nSamps-(i+2*j*nSamps/nDivs)-1] = ch2;
+			}
+			f += df;
 		}
 		
 		windows = new float[2][nwindows][sampsPerWindow];
