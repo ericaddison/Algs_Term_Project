@@ -23,6 +23,24 @@ public class TwoSidedFftDbPlot extends PlotFrame{
 		Color.CYAN, 
 		Color.MAGENTA, 
 		Color.YELLOW};
+
+	public TwoSidedFftDbPlot(int N, float[][] data) {
+		super(new PlotPanel(1,1));
+		
+		Sampling f = (new Fft(N)).getFrequencySampling1();
+		float[] freqs = negativeTwoSideIfy(f.getValues());
+		
+		for(int i=0; i<data.length; i++){
+			PointsView pv = 
+					this.getPlotPanel().addPoints(freqs,twoSidedFftMagDb(data[i]));
+			pv.setLineColor(colors[i%colors.length]);
+		}
+
+		GridView gv = this.getPlotPanel().addGrid();
+		gv.setColor(Color.LIGHT_GRAY);
+		gv.setStyle(Style.DASH);
+		
+	}	
 	
 	public TwoSidedFftDbPlot(int N, List<float[]> data) {
 		super(new PlotPanel(1,1));
@@ -86,7 +104,7 @@ public class TwoSidedFftDbPlot extends PlotFrame{
 		// db relative to max
 		for(int i=0; i<fftMag.length; i++){
 			if(fftMag[i]==0)
-				fftMag[i] = fftMag[i-1];
+				fftMag[i] = (i==0)?-100:fftMag[i-1];
 			else
 				fftMag[i] = 10*(float)Math.log10(Math.abs(fftMag[i])/max);
 		}
