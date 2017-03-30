@@ -30,6 +30,8 @@ public class FiltersDemo {
 		int N = (int)Math.pow(2, 9);
 		
 		float cutoff = 0.1f;
+		filters.add(new LowPassFilter(cutoff, new RectangleWindow(N)));
+		filters.add(new LowPassFilter(cutoff, new BartlettWindow(N)));
 		filters.add(new LowPassFilter(cutoff, new HammingWindow(N)));
 		filters.add(new LowPassFilter(cutoff, new HannWindow(N)));
 		filters.add(new LowPassFilter(cutoff, new BlackmannWindow(N)));

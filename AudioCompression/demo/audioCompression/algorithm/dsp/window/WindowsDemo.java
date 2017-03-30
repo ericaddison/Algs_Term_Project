@@ -25,11 +25,13 @@ public class WindowsDemo {
 	public static void main(String args[]){
 		
 		List<Window> windows = new ArrayList<>();
-		int N = (int)Math.pow(2, 11);
+		int N = (int)Math.pow(2, 10);
+		windows.add(new RectangleWindow(N));
+		windows.add(new BartlettWindow(N));
 		windows.add(new HammingWindow(N));
 		windows.add(new HannWindow(N));
 		windows.add(new BlackmannWindow(N));
-		windows.add(new KaiserWindow(N, 0.003f));
+		windows.add(new KaiserWindow(N, 5.0f/N));
 		
 		PlotFrame f1 = new PlotFrame(new PlotPanel(1,1));
 		List<float[]> data = new ArrayList<>();
