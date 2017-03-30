@@ -1,9 +1,5 @@
 package audioCompression.algorithm.dsp;
 
-import edu.mines.jtk.mosaic.PlotFrame;
-import audioCompression.algorithm.dsp.window.BlackmannWindow;
-import audioCompression.algorithm.dsp.window.HannWindow;
-import audioCompression.algorithm.dsp.window.TwoSidedFftDbPlot;
 import audioCompression.algorithm.dsp.window.Window;
 
 public class CosineModulatedFilterBank {
@@ -20,6 +16,10 @@ public class CosineModulatedFilterBank {
 		filters = makeFilters();
 	}
 	
+	public float[][] getFilters() {
+		return filters;
+	}
+
 	private float[][] makeFilters(){
 		float[][] h = new float[nBands][];
 		float[] h0 = prototypeFilter.getCoefficients();
@@ -37,23 +37,6 @@ public class CosineModulatedFilterBank {
 		}
 		
 		return h;
-	}
-	
-	
-	public static void main(String[] args){
-		
-		int L = 100;
-		int N = 4;
-		int M = L*N;
-		
-		CosineModulatedFilterBank filterBank = new CosineModulatedFilterBank(N, new HannWindow(M));
-		
-		TwoSidedFftDbPlot plot = new TwoSidedFftDbPlot(M, filterBank.filters);
-		
-		plot.setSize(500, 400);
-		plot.setDefaultCloseOperation(PlotFrame.EXIT_ON_CLOSE);
-		plot.setVisible(true);
-		
 	}
 	
 }

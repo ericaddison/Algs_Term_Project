@@ -40,6 +40,7 @@ public class WindowsDemo {
 			data.add(w.getCoefficients());
 			PointsView pv = f1.getPlotPanel().addPoints(w.getCoefficients());
 			pv.setLineColor(colors[windows.indexOf(w)%windows.size()]);
+			pv.setLineWidth(2);
 		}
 
 		GridView gv = f1.getPlotPanel().addGrid();

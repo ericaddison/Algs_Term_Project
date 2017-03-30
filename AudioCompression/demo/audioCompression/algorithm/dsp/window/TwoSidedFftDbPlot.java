@@ -1,6 +1,7 @@
 package audioCompression.algorithm.dsp.window;
 
 import java.awt.Color;
+import java.util.Arrays;
 import java.util.List;
 
 import edu.mines.jtk.dsp.Fft;
@@ -10,6 +11,7 @@ import edu.mines.jtk.mosaic.PlotFrame;
 import edu.mines.jtk.mosaic.PlotPanel;
 import edu.mines.jtk.mosaic.GridView.Style;
 import edu.mines.jtk.mosaic.PointsView;
+import edu.mines.jtk.mosaic.PointsView.Line;
 
 public class TwoSidedFftDbPlot extends PlotFrame{
 
@@ -34,11 +36,19 @@ public class TwoSidedFftDbPlot extends PlotFrame{
 			PointsView pv = 
 					this.getPlotPanel().addPoints(freqs,twoSidedFftMagDb(data[i]));
 			pv.setLineColor(colors[i%colors.length]);
+			pv.setLineWidth(2);
+			if(i%2==1)
+				pv.setLineStyle(Line.DASH);
 		}
 
 		GridView gv = this.getPlotPanel().addGrid();
 		gv.setColor(Color.LIGHT_GRAY);
 		gv.setStyle(Style.DASH);
+
+		float[] dummy = new float[freqs.length];
+		Arrays.fill(dummy, 5f);
+		
+		this.getPlotPanel().addPoints(freqs, dummy);
 		
 	}	
 	
@@ -52,6 +62,7 @@ public class TwoSidedFftDbPlot extends PlotFrame{
 			PointsView pv = 
 					this.getPlotPanel().addPoints(freqs,twoSidedFftMagDb(d));
 			pv.setLineColor(colors[data.indexOf(d)%colors.length]);
+			pv.setLineWidth(2);
 		}
 
 		GridView gv = this.getPlotPanel().addGrid();
