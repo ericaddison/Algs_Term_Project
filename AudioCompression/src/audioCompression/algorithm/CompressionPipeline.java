@@ -43,7 +43,7 @@ public class CompressionPipeline {
 	 */
 	@SuppressWarnings("unchecked")
 	public AudioCompressionType processForward(AudioCompressionType input){
-		if(input.getClass() != pipeline.getFirst().getInputClass())
+		if( !pipeline.getFirst().getInputClass().isInstance(input) )
 			throw new IllegalArgumentException("CompressionPipeline: Invalid "
 					+ "input type to processForward() -- "
 					+ "expected " + pipeline.getFirst().getInputClass() 
@@ -67,7 +67,7 @@ public class CompressionPipeline {
 	 */
 	@SuppressWarnings("unchecked")
 	public AudioCompressionType processReverse(AudioCompressionType input){
-		if(input.getClass() != pipeline.getLast().getOutputClass())
+		if( !pipeline.getLast().getOutputClass().isInstance(input) )
 			throw new IllegalArgumentException("CompressionPipeline: Invalid "
 					+ "input type to processReverse() -- "
 					+ "expected " + pipeline.getLast().getOutputClass() 
