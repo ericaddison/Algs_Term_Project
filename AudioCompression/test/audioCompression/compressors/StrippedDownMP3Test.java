@@ -7,8 +7,9 @@ import org.junit.Test;
 public class StrippedDownMP3Test {
 
 	@Test
-	public void test() {
-		fail("Not yet implemented");
+	public void instantiate() {
+		StrippedDownMP3 compressor = new StrippedDownMP3();
+		assertNotNull(compressor);
 	}
 
 }

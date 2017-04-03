@@ -1,7 +1,7 @@
 package audioCompression.compressors;
 
 import audioCompression.algorithm.*;
-import audioCompression.types.CompressedAudio;
+import audioCompression.types.CompressedAudioFile;
 import audioCompression.types.RawAudio;
 
 /**
@@ -24,17 +24,18 @@ public class StrippedDownMP3 implements AudioCompressor{
 	public StrippedDownMP3() {
 		pipeline.addStep(new FilterBankStep());
 		pipeline.addStep(new MdctStep());
+		pipeline.addStep(new ByteBufferizerStep());
 		pipeline.addStep(new HuffmanEncoderStep());
-		pipeline.addStep(new BitstreamFormatterStep());
+		pipeline.addStep(new CompressedAudioFileWriter());
 	}
 	
 	@Override
-	public CompressedAudio compress(RawAudio rawInput){
-		return (CompressedAudio) pipeline.processForward(rawInput);
+	public CompressedAudioFile compress(RawAudio rawInput){
+		return (CompressedAudioFile) pipeline.processForward(rawInput);
 	}
 	
 	@Override
-	public RawAudio decompress(CompressedAudio compressedInput){
+	public RawAudio decompress(CompressedAudioFile compressedInput){
 		return (RawAudio) pipeline.processReverse(compressedInput);
 	}
 	
