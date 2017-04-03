@@ -6,7 +6,7 @@ public class AudioByteBuffer implements AudioCompressionType{
 
 	private ByteBuffer buffer;
 	
-	AudioByteBuffer(ByteBuffer buffer) {
+	public AudioByteBuffer(ByteBuffer buffer) {
 		this.buffer = buffer;
 	}
 	

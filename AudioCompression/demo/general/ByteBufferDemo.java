@@ -2,6 +2,8 @@ package general;
 
 import java.nio.ByteBuffer;
 
+import audioCompression.types.testImpls.AudioByteBufferImpl;
+
 
 /**
  * Simple demo showing how to use a byte buffer
@@ -38,6 +40,14 @@ public class ByteBufferDemo {
 		System.out.println("The first float in the buffer is: " + readFloat);
 		System.out.println("The first float from the original array is: " + floatArray[0]);
 		System.out.println("The difference is: " + (floatArray[0]-readFloat));
+		
+		
+		// demo the AudioByteBufferImpl class
+		int Nbb = 4;
+		AudioByteBufferImpl abb = new AudioByteBufferImpl(Nbb);
+		System.out.print("\nHere are the AudioByteBuffer ints: ");
+		for(int i=0; i<Nbb; i++)
+			System.out.print(abb.getBuffer().getInt() + " ");
 		
 	}
 	
