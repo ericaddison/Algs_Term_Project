@@ -12,9 +12,20 @@ public class CosineModulatedFilterBank {
 	public CosineModulatedFilterBank(int nBands, Window w) {
 		if(w.getLength()%nBands != 0)
 			w.setLength(w.getLength() + (nBands - w.getLength()%nBands));
-		this.prototypeFilter = new Filter(0.5f/(2*nBands), w);
+		this.prototypeFilter = FilterFactory.makeLowpassFilter(0.5f/(2*nBands), w);
 		this.nBands = nBands;
+		filters = new Filter[nBands];
+		decimatedFilters = new Filter[nBands];
 		makeFilters();
+	}
+	
+	public float[][] applyFilters(float in[]){
+		float[][] out = new float[nBands][];
+		
+		for(int i=0; i<nBands; i++)
+			out[i] = decimatedFilters[i].applyTimeDomain(downsample(in, i));
+		
+		return out;
 	}
 	
 	public Filter[] getFilters() {
@@ -39,6 +50,17 @@ public class CosineModulatedFilterBank {
 		}
 	}
 	
+	
+	public float[] downsample(float[] inArray, int offset){
+		int M = nBands;
+		
+		float[] outArray = new float[inArray.length/M];
+		
+		for(int j=0; j<inArray.length/M; j++)
+			outArray[j] = inArray[offset + j*M];
+		
+		return outArray;
+	}
 	
 	
 }
