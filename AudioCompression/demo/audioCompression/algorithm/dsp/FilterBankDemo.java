@@ -5,6 +5,8 @@ import audioCompression.algorithm.dsp.window.HannWindow;
 import audioCompression.algorithm.dsp.window.KaiserWindow;
 import audioCompression.algorithm.dsp.window.KbdWindow;
 import audioCompression.algorithm.dsp.window.TwoSidedFftDbPlot;
+import audioCompression.types.Subbands;
+import audioCompression.types.testImpls.RawAudioImpl;
 import edu.mines.jtk.mosaic.PlotFrame;
 
 public class FilterBankDemo {
@@ -25,11 +27,14 @@ public class FilterBankDemo {
 		for(int i=0; i<N; i++)
 			filterCoeffs[i] = filterBank.getFilters()[i].getCoefficients();
 		
-		TwoSidedFftDbPlot plot = new TwoSidedFftDbPlot(M, filterCoeffs);
 		
+		TwoSidedFftDbPlot plot = new TwoSidedFftDbPlot(M, filterCoeffs);
 		plot.setSize(500, 400);
 		plot.setDefaultCloseOperation(PlotFrame.EXIT_ON_CLOSE);
 		plot.setVisible(true);
+		
+		
+		
 		
 	}
 	

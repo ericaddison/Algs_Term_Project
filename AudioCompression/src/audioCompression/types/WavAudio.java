@@ -2,10 +2,8 @@ package audioCompression.types;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.NClob;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.function.Consumer;
 
 import libs.wavParser.WavFile;
 import libs.wavParser.WavFileException;
@@ -14,7 +12,7 @@ public class WavAudio implements RawAudio{
 
 	private WavFile wavFile;
 	private long nSamples;             // total number of samples (per channel) in the audio file 
-	private long nWindows;             // total number of windows (including the overlap)
+	private int nWindows;             // total number of windows (including the overlap)
 	private int samplesPerWindow;      // number of samples per window
 	private int windowOverlap;       // percentage of window overlap
 	private File inputFile;
@@ -31,7 +29,7 @@ public class WavAudio implements RawAudio{
 			if(windowOverlap>samplesPerWindow/2 || windowOverlap<0)
 				throw new IllegalArgumentException("WavAudio: require 0<=windowOverlap<=sampsPerWindow/2");			
 			// set up window information, using wav frame-based values as intermediate information
-			this.nWindows = (wavFile.getNumFrames()-samplesPerWindow)/(samplesPerWindow-windowOverlap) + 1;
+			this.nWindows = (int)((wavFile.getNumFrames()-samplesPerWindow)/(samplesPerWindow-windowOverlap) + 1);
 		} catch (IOException | WavFileException e) {
 			e.printStackTrace();
 		} finally{
@@ -49,7 +47,7 @@ public class WavAudio implements RawAudio{
 	}
 
 	@Override
-	public long getNWindows(){
+	public int getNWindows(){
 		return nWindows;
 	}
 	

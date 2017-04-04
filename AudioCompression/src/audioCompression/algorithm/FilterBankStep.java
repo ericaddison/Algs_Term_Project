@@ -1,73 +1,80 @@
 package audioCompression.algorithm;
 
-import java.util.Arrays;
 import java.util.Iterator;
 
-import edu.mines.jtk.dsp.BandPassFilter;
-import edu.mines.jtk.dsp.Conv;
-
+import audioCompression.algorithm.dsp.CosineModulatedFilterBank;
+import audioCompression.algorithm.dsp.window.HannWindow;
+import audioCompression.algorithm.dsp.window.Window;
 import audioCompression.types.AudioCompressionType;
 import audioCompression.types.RawAudio;
 import audioCompression.types.Subbands;
+import audioCompression.types.WavAudio;
 
 public class FilterBankStep implements AlgorithmStep<RawAudio, Subbands> {
 
-	private static final String NAME = "Polyphase Filterbank";
+	private static final String NAME = "Multirate Filterbank";
 	private int nBands = 32;
-	BandPassFilter bpf;
-	float[] filterCoeffs;
-	float[][] polyphaseFilters;
+	private Window w;
+	private CosineModulatedFilterBank filterBank;
 	
 	
 	public FilterBankStep() {
-		this(32);
+		this(32, new HannWindow(100));
 	}
 	 
-	public FilterBankStep(int nBands) {
+	public FilterBankStep(int nBands, Window w) {
 		this.nBands = nBands;
-		bpf = new BandPassFilter(0, 0.5/nBands, 0.005, 0.01);
-		padFilter();
-		polyphaseFilters = downsample(filterCoeffs);
+		this.w = w;
 	}
 	
 	
 	@Override
 	public Subbands forward(RawAudio input) {
 		Iterator<float[][]> iter = input.getWindowIterator();
+		int windowCount = 0;
+		Subbands subbands = new Subbands(input, nBands);
+		if(filterBank==null){
+			w.setLength(subbands.getSamplesPerWindow());
+			filterBank = new CosineModulatedFilterBank(nBands, w);
+		}
 		
 		while(iter.hasNext()){
 			
 			float[][] nextWindow = iter.next();
 			
-			for(int i=0; i<nextWindow.length; i++){
-			// step 1: decimate
-				float[][] decimated = downsample(nextWindow[i]);
-				
-			// step 2: filter
-				for(int j=0; j<nBands; j++){
-					float[] out = new float[decimated[j].length];
-					Conv.conv(decimated[j].length, 
-								0, 
-								decimated[j], 
-								polyphaseFilters[j].length,
-								0, 
-								polyphaseFilters[j], 
-								decimated[j].length,
-								0,
-								out);
-					System.out.println(Arrays.toString(out));
-				}
-			// step 3: DFT
-			
+			for(int i=0; i<input.getNChannels(); i++){
+				float[][] channelized = filterBank.applyFilters(nextWindow[i]);
+				for(int j=0; j<nBands; j++)
+					subbands.setWindowArray(i, j, windowCount, channelized[j]);
 			}
+			
 		}
-		return null;
+		return subbands;
 	}
 
 	@Override
 	public RawAudio reverse(Subbands input) {
-		// TODO Auto-generated method stub
-		return null;
+		Iterator<float[][][]> iter = input.getWindowIterator();
+		int windowCount = 0;
+		WavAudio out = new WavAudio(samplesPerWindow, windowOverlap);
+		
+		if(filterBank==null){
+			w.setLength(input.getSamplesPerWindow());
+			filterBank = new CosineModulatedFilterBank(nBands, w);
+		}
+		
+		while(iter.hasNext()){
+			
+			float[][][] nextWindow = iter.next();
+			
+			for(int i=0; i<input.getNChannels(); i++){
+				float[][] channelized = filterBank.applyFilters(nextWindow[i]);
+				for(int j=0; j<nBands; j++)
+					subbands.setWindowArray(i, j, windowCount, channelized[j]);
+			}
+			
+		}
+		return subbands;
 	}
 
 	@Override
@@ -91,39 +98,6 @@ public class FilterBankStep implements AlgorithmStep<RawAudio, Subbands> {
 
 	public void setnBands(int nBands) {
 		this.nBands = nBands;
-	}
-	
-	
-	public float[][] downsample(float[] inArray){
-		if(inArray.length%nBands!=0)
-			throw new IllegalArgumentException("FilterBankStep.downsample: inArray.length%nBands!=0");
-		
-		int M = nBands;
-		
-		float[][] outArray = new float[M][inArray.length/M];
-		
-		for(int i=0; i<M; i++)
-			for(int j=0; j<inArray.length/M; j++)
-				outArray[i][j] = inArray[i + j*M];
-		
-		return outArray;
-	}
-
-	
-	public float[] padSymmetric(float[] arr, int padAmount) {
-		float[] padded = new float[arr.length + padAmount];
-		for(int i=0; i<arr.length; i++)
-			padded[i+padAmount/2] = arr[i];
-		return padded;
-	}
-	
-	
-	private void padFilter() {
-		bpf.getCoefficients1();
-		int padAmount = 0;
-		if(filterCoeffs.length%nBands!=0)
-			padAmount = nBands - filterCoeffs.length%nBands;
-		filterCoeffs = padSymmetric(bpf.getCoefficients1(), padAmount);
 	}
 
 }

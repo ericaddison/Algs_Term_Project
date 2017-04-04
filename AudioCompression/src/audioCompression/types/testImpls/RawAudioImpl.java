@@ -71,7 +71,7 @@ public class RawAudioImpl implements RawAudio{
 	}
 
 	@Override
-	public long getNWindows() {
+	public int getNWindows() {
 		return nwindows;
 	}
 

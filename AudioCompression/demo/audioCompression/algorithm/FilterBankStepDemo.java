@@ -1,63 +1,27 @@
 package audioCompression.algorithm;
 
-import edu.mines.jtk.dsp.Fft;
-import edu.mines.jtk.mosaic.PlotFrame;
-import edu.mines.jtk.mosaic.PlotPanel;
-import edu.mines.jtk.util.ArrayMath;
+import audioCompression.algorithm.dsp.window.HannWindow;
+import audioCompression.types.Subbands;
+import audioCompression.types.testImpls.RawAudioImpl;
 
 public class FilterBankStepDemo {
 	
 	public static void main(String[] args){
-		FilterBankStep fbs = new FilterBankStep(32);
 		
-		// fft of filter
+		int nbands = 16;
 		
-		System.out.println("Filter length: " + fbs.bpf.getCoefficients1().length);
+		// apply to audio test
+		RawAudioImpl audio = new RawAudioImpl(10000, 1152, 0);
+		FilterBankStep fb = new FilterBankStep(nbands, new HannWindow(100));
 		
-		PlotFrame filterFrame = filterPlot(fbs);
-		filterFrame.setVisible(true);
+		Subbands sub = fb.forward(audio);
 		
-		PlotFrame filterFftFrame = filterFftPlot(fbs);
-		filterFftFrame.setVisible(true);
+		System.out.println(sub.getAllWindows().length);
+		System.out.println(sub.getAllWindows()[0].length);
+		System.out.println(sub.getAllWindows()[0][0].length);
+		System.out.println(sub.getAllWindows()[0][0][0].length);
 		
 	}
 	
 	
-	public static PlotFrame filterPlot(FilterBankStep fbs){
-		PlotFrame f = new PlotFrame(new PlotPanel(1,1));
-		f.setDefaultCloseOperation(PlotFrame.EXIT_ON_CLOSE);
-		f.setSize(400, 300);
-		
-		float[] filter = fbs.bpf.getCoefficients1();
-		f.getPlotPanel().addPoints(filter);
-		return f;
-	}
-	
-	
-	public static PlotFrame filterFftPlot(FilterBankStep fbs){
-		PlotFrame f = new PlotFrame(new PlotPanel(1,1));
-		f.setDefaultCloseOperation(PlotFrame.EXIT_ON_CLOSE);
-		f.setSize(400, 300);
-		
-		float[] filter = fbs.bpf.getCoefficients1();
-
-		Fft fft = new Fft(filter);
-		System.out.println(fft.getFrequencySampling1().getFirst() + " - " + fft.getFrequencySampling1().getLast());
-		float[] filterFFT = fft.applyForward(filter);
-		System.out.println("filterFFT length: " + filterFFT.length);
-
-		
-		float[] mag = complexMag(filterFFT);
-		f.getPlotPanel().addPoints(ArrayMath.rampfloat(0, 0.5f, mag.length), mag);
-		
-		return f;
-	}
-	
-	public static float[] complexMag(float[] cpx){
-		float[] magArray = new float[cpx.length/2];
-		for(int i=0; i<magArray.length; i++)
-			magArray[i] = (float)Math.sqrt( cpx[2*i]*cpx[2*i] + cpx[2*i+1]*cpx[2*i+1]);
-		return magArray;
-			
-	}
 }

@@ -10,7 +10,7 @@ public interface RawAudio extends AudioCompressionType {
 	
 	public long getSamplesPerWindow();
 	
-	public long getNWindows();
+	public int getNWindows();
 	
 	public int getWindowOverlap();
 	
@@ -23,6 +23,11 @@ public interface RawAudio extends AudioCompressionType {
 	 */
 	public float[][] getAudioBuffer(int nsamples);
 	
+	
+	/**
+	 * window returned with dimensions [nChannels][nWindows][nSamples]
+	 * @return
+	 */
 	public float[][][] getAllWindows();
 	
 	
