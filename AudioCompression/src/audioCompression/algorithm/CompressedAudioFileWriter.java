@@ -1,19 +1,19 @@
 package audioCompression.algorithm;
 
+import audioCompression.types.AudioByteBuffer;
 import audioCompression.types.AudioCompressionType;
-import audioCompression.types.CompressedAudio;
-import audioCompression.types.EncodedLines;
+import audioCompression.types.CompressedAudioFile;
 
-public class BitstreamFormatterStep implements AlgorithmStep<EncodedLines, CompressedAudio> {
+public class CompressedAudioFileWriter implements AlgorithmStep<AudioByteBuffer, CompressedAudioFile> {
 
 	@Override
-	public CompressedAudio forward(EncodedLines input) {
+	public CompressedAudioFile forward(AudioByteBuffer input) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public EncodedLines reverse(CompressedAudio input) {
+	public AudioByteBuffer reverse(CompressedAudioFile input) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -26,12 +26,12 @@ public class BitstreamFormatterStep implements AlgorithmStep<EncodedLines, Compr
 
 	@Override
 	public Class<? extends AudioCompressionType> getInputClass() {
-		return EncodedLines.class;
+		return AudioByteBuffer.class;
 	}
 
 	@Override
 	public Class<? extends AudioCompressionType> getOutputClass() {
-		return CompressedAudio.class;
+		return CompressedAudioFile.class;
 	}
 
 }

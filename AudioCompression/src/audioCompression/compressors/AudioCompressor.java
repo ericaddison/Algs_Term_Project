@@ -1,6 +1,6 @@
 package audioCompression.compressors;
 
-import audioCompression.types.CompressedAudio;
+import audioCompression.types.CompressedAudioFile;
 import audioCompression.types.RawAudio;
 
 
@@ -12,8 +12,8 @@ import audioCompression.types.RawAudio;
  */
 public interface AudioCompressor {
 
-	public CompressedAudio compress(RawAudio rawInput);
+	public CompressedAudioFile compress(RawAudio rawInput);
 	
-	public RawAudio decompress(CompressedAudio compressedInput);
+	public RawAudio decompress(CompressedAudioFile compressedInput);
 	
 }
