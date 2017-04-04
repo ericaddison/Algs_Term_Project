@@ -3,8 +3,6 @@ package audioCompression.algorithm;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import com.sun.org.apache.xerces.internal.impl.dv.xs.DecimalDV;
-
 import edu.mines.jtk.dsp.BandPassFilter;
 import edu.mines.jtk.dsp.Conv;
 

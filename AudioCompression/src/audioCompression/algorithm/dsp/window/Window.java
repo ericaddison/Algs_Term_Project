@@ -5,15 +5,13 @@ public abstract class Window {
 	protected float[] coefficients;
 	protected int N;
 	protected float norm;
+	protected boolean stale;
 	
 	abstract public float eval(int n);
 
 	public Window(int N) {
 		this.N = N;
-		coefficients = new float[N];
-		for(int i=0; i<N; i++)
-			coefficients[i] = eval(i);
-		norm = computeNorm();
+		refreshCoefficients();
 	}
 	
 	public void setLength(int length) {
@@ -28,6 +26,8 @@ public abstract class Window {
 	}
 
 	public float[] getCoefficients() {
+		if(stale)
+			refreshCoefficients();
 		return coefficients;
 	}
 	
@@ -51,10 +51,20 @@ public abstract class Window {
 	}
 
 	private float[] apply(float[] in, float fac, int offset){
+		if(stale)
+			refreshCoefficients();
 		float[] applied = new float[N];
 		for(int i=0; i<N; i++)
 			applied[i] = in[i+offset]*fac*coefficients[i];
 		return applied;
+	}
+	
+	private void refreshCoefficients(){
+		coefficients = new float[N];
+		for(int i=0; i<N; i++)
+			coefficients[i] = eval(i);
+		norm = computeNorm();
+		stale = false;
 	}
 	
 }

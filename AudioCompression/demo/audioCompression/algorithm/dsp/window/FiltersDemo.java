@@ -4,7 +4,8 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-import audioCompression.algorithm.dsp.LowPassFilter;
+import audioCompression.algorithm.dsp.Filter;
+import audioCompression.algorithm.dsp.FilterFactory;
 
 import edu.mines.jtk.mosaic.GridView;
 import edu.mines.jtk.mosaic.GridView.Style;
@@ -26,21 +27,22 @@ public class FiltersDemo {
 	
 	public static void main(String args[]){
 		
-		List<LowPassFilter> filters = new ArrayList<>();
+		List<Filter> filters = new ArrayList<>();
 		int N = (int)Math.pow(2, 9);
 		
 		float cutoff = 0.1f;
-		filters.add(new LowPassFilter(cutoff, new RectangleWindow(N)));
-		filters.add(new LowPassFilter(cutoff, new BartlettWindow(N)));
-		filters.add(new LowPassFilter(cutoff, new HammingWindow(N)));
-		filters.add(new LowPassFilter(cutoff, new HannWindow(N)));
-		filters.add(new LowPassFilter(cutoff, new BlackmannWindow(N)));
-		filters.add(new LowPassFilter(cutoff, new KaiserWindow(N, 5.0f/N)));
+		filters.add(FilterFactory.makeLowpassFilter(cutoff, new RectangleWindow(N)));
+		filters.add(FilterFactory.makeLowpassFilter(cutoff, new BartlettWindow(N)));
+		filters.add(FilterFactory.makeLowpassFilter(cutoff, new HammingWindow(N)));
+		filters.add(FilterFactory.makeLowpassFilter(cutoff, new HannWindow(N)));
+		filters.add(FilterFactory.makeLowpassFilter(cutoff, new BlackmannWindow(N)));
+		filters.add(FilterFactory.makeLowpassFilter(cutoff, new KaiserWindow(N, 5.0f/N)));
+		filters.add(FilterFactory.makeLowpassFilter(cutoff, new KbdWindow(N, 15.0f/N)));
 		
 		PlotFrame f1 = new PlotFrame(new PlotPanel(1,1));
 		List<float[]> data = new ArrayList<>();
 		
-		for(LowPassFilter f : filters){
+		for(Filter f : filters){
 			data.add(f.getCoefficients());
 			PointsView pv = f1.getPlotPanel().addPoints(f.getCoefficients());
 			pv.setLineColor(colors[filters.indexOf(f)%filters.size()]);
