@@ -1,5 +1,7 @@
 package audioCompression.algorithm.dsp;
 
+import java.util.Arrays;
+
 import audioCompression.algorithm.dsp.window.HammingWindow;
 import audioCompression.algorithm.dsp.window.HannWindow;
 import audioCompression.algorithm.dsp.window.KaiserWindow;
@@ -14,7 +16,7 @@ public class FilterBankDemo {
 	public static void main(String[] args){
 		
 		int L = 50;
-		int N = 8;
+		int N = 4;
 		int M = L*N;
 		
 		//CosineModulatedFilterBank filterBank = new CosineModulatedFilterBank(N, new HannWindow(M));
@@ -26,7 +28,6 @@ public class FilterBankDemo {
 		
 		for(int i=0; i<N; i++)
 			filterCoeffs[i] = filterBank.getFilters()[i].getCoefficients();
-		
 		
 		TwoSidedFftDbPlot plot = new TwoSidedFftDbPlot(M, filterCoeffs);
 		plot.setSize(500, 400);

@@ -12,7 +12,7 @@ public class CosineModulatedFilterBank {
 	public CosineModulatedFilterBank(int nBands, Window w) {
 		if(w.getLength()%nBands != 0)
 			w.setLength(w.getLength() + (nBands - w.getLength()%nBands));
-		this.prototypeFilter = FilterFactory.makeLowpassFilter(0.5f/(2*nBands), w);
+		this.prototypeFilter = FilterFactory.makeLowpassFilter(0.5f/(nBands), w);
 		this.nBands = nBands;
 		filters = new Filter[nBands];
 		decimatedFilters = new Filter[nBands];
@@ -22,8 +22,12 @@ public class CosineModulatedFilterBank {
 	public float[][] applyFilters(float in[]){
 		float[][] out = new float[nBands][];
 		
-		for(int i=0; i<nBands; i++)
-			out[i] = decimatedFilters[i].applyTimeDomain(downsample(in, i));
+		for(int i=0; i<nBands; i++){
+			//System.out.println("-- " + Arrays.toString(decimatedFilters[i].getCoefficients()));
+			//out[i] = decimatedFilters[i].applyTimeDomain(downsample(in, i));
+			out[i] = filters[i].applyTimeDomain(in);
+			//System.out.println(Arrays.toString(out[i]));
+		}
 		
 		return out;
 	}
@@ -37,16 +41,16 @@ public class CosineModulatedFilterBank {
 		int M = h0.length;	// length of prototype filter
 		int N = nBands;		// number of subbands
 		int L = M/N;		// length of polyphase components
-		
+
 		for(int k=0; k<N; k++){
 			float[] filter = new float[M];
-			double phi_k = (k+0.5)*(L+1)*Math.PI/2.0;
+			double phi_k = (k)*(L+1)*Math.PI/2.0;
 			for(int n=0; n<M; n++){
-				double phi = (k+0.5)*(n-(M-1)/2.0)*Math.PI/N;
+				double phi = (k)*(n-(M-1)/2.0)*Math.PI/N;
 				filter[n] = (float)(h0[n]*Math.cos(phi+phi_k));
 			}
 			filters[k] = FilterFactory.makeFilter(filter);
-			decimatedFilters[k] = FilterFactory.makeDecimatedFilter(filters[k],M);
+			decimatedFilters[k] = FilterFactory.makeDecimatedFilter(filters[k],N,k);
 		}
 	}
 	

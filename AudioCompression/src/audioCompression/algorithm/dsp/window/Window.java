@@ -16,6 +16,7 @@ public abstract class Window {
 	
 	public void setLength(int length) {
 		this.N = length;
+		coefficients = new float[N];
 		for(int i=0; i<N; i++)
 			coefficients[i] = eval(i);
 		norm = computeNorm();

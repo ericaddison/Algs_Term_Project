@@ -12,8 +12,8 @@ public class FilterFactory {
 		return new Filter(coefficients);
 	}
 	
-	public static Filter makeDecimatedFilter(Filter filter, int decimationFactor){
-		return new Filter(filter, decimationFactor);
+	public static Filter makeDecimatedFilter(Filter filter, int decimationFactor, int offset){
+		return new Filter(filter, decimationFactor, offset);
 	}
 	
 }
