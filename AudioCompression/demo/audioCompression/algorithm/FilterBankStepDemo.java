@@ -5,6 +5,7 @@ import java.awt.Color;
 import edu.mines.jtk.mosaic.PlotFrame;
 import edu.mines.jtk.mosaic.PlotPanel;
 import edu.mines.jtk.mosaic.PointsView;
+import audioCompression.algorithm.dsp.CosineModulatedFilterBank;
 import audioCompression.algorithm.dsp.window.HammingWindow;
 import audioCompression.algorithm.dsp.window.HannWindow;
 import audioCompression.algorithm.dsp.window.KaiserWindow;
@@ -27,11 +28,13 @@ public class FilterBankStepDemo {
 	
 	public static void main(String[] args){
 		
-		int nbands = 4;
+		int nbands = 8;
+		int fN = 2*512;
 		
 		// apply to audio test
-		RawAudioImpl audio = new RawAudioImpl(500, 500, 0);
-		FilterBankStep fb = new FilterBankStep(nbands, new HannWindow(2048));
+		RawAudioImpl audio = new RawAudioImpl(1000, 1000, 0);
+		FilterBankStep fb = new FilterBankStep(nbands, new HammingWindow(fN));
+		//FilterBankStep fb = new FilterBankStep(nbands, new KaiserWindow(fN,0.005f));
 		
 		Subbands sub = fb.forward(audio);
 		WavAudioOutput output = (WavAudioOutput)fb.reverse(sub);

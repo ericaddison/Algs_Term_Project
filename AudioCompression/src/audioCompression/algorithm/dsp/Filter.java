@@ -47,7 +47,7 @@ public class Filter {
 		float[] out = new float[in.length];
 		Conv.conv(in.length, 0, in, 
 				coefficients.length, 0, coefficients,
-				in.length, (int)(Math.abs(coefficients.length)/2), out);
+				in.length, (int)(Math.abs(coefficients.length)/2+0.5), out);
 		
 		return out;
 	}
@@ -56,7 +56,7 @@ public class Filter {
 		float[] out = new float[in.length];
 		Conv.conv(in.length, 0, in, 
 				coefficients.length, 0, reverseCoefficients,
-				in.length, (int)(Math.abs(coefficients.length)/2), out);
+				in.length, (int)(Math.abs(coefficients.length)/2-0.5), out);
 		
 		return out;
 	}

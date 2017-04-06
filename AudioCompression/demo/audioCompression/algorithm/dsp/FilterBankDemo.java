@@ -15,12 +15,11 @@ public class FilterBankDemo {
 
 	public static void main(String[] args){
 		
-		int L = 50;
 		int N = 4;
-		int M = L*N;
+		int M = 512;
 		
-		//CosineModulatedFilterBank filterBank = new CosineModulatedFilterBank(N, new HannWindow(M));
-		CosineModulatedFilterBank filterBank = new CosineModulatedFilterBank(N, new HammingWindow(M));
+		CosineModulatedFilterBank filterBank = new CosineModulatedFilterBank(N, new HannWindow(M));
+		//CosineModulatedFilterBank filterBank = new CosineModulatedFilterBank(N, new HammingWindow(M));
 		//CosineModulatedFilterBank filterBank = new CosineModulatedFilterBank(N, new KaiserWindow(M,35.0f/M));
 		//CosineModulatedFilterBank filterBank = new CosineModulatedFilterBank(N, new KbdWindow(M,10.0f/M));
 		

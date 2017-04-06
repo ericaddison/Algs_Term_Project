@@ -24,6 +24,7 @@ public class CosineModulatedFilterBank {
 		
 		for(int i=0; i<nBands; i++){
 			out[i] = filters[i].applyTimeDomain(in);
+			out[i] = downsample(out[i], i);
 		}
 		
 		return out;
@@ -32,14 +33,30 @@ public class CosineModulatedFilterBank {
 	public float[][] analysisDecimated(float in[]){
 		float[][] out = new float[nBands][];
 		
-		for(int i=0; i<nBands; i++){
+		for(int i=0; i<nBands; i++)
 			out[i] = decimatedFilters[i].applyTimeDomain(downsample(in, i));
-		}
 		
 		return out;
 	}
 	
 	public float[] synthesis(float in[][]){
+		float[] out = new float[in[0].length*in.length];
+		
+		for(int i=0; i<nBands; i++){
+			float[] filt = new float[out.length];
+			for(int j=0; j<in[i].length; j++)
+				filt[i+j*nBands] = in[i][j];
+			
+			filt = filters[i].applyTimeDomainReverse(filt);
+			
+			for(int j=0; j<out.length; j++)
+				out[j] += filt[j]/nBands;
+		}
+		
+		return out;
+	}	
+
+	public float[] synthesisDecimated(float in[][]){
 		float[] out = new float[in[0].length*in.length];
 		
 		for(int i=0; i<nBands; i++){
@@ -80,7 +97,7 @@ public class CosineModulatedFilterBank {
 		
 		float[] outArray = new float[inArray.length/M];
 		
-		for(int j=0; j<inArray.length/M; j++)
+		for(int j=0; j<outArray.length; j++)
 			outArray[j] = inArray[offset + j*M];
 		
 		return outArray;

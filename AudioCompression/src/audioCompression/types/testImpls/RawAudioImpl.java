@@ -30,9 +30,9 @@ public class RawAudioImpl implements RawAudio{
 		
 		buffer = new float[2][nSamps];
 		float f0 = 0.0f;
-		float df = 2*0.3f/nSamps;
+		int nDivs = 2;
+		float df = 2*0.05f/nSamps * nDivs;
 		float f = 0;
-		int nDivs = 6;
 		
 		for(int i=0; i<nSamps/nDivs; i++){
 			for(int j=0; j<nDivs/2; j++){
