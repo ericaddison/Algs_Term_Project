@@ -5,7 +5,7 @@ import java.util.Iterator;
 
 public class Subbands implements AudioCompressionType {
 
-	long sampleRate;
+	int sampleRate;
 	int nWindows;
 	int samplesPerWindow;
 	int windowOverlap;
@@ -14,17 +14,17 @@ public class Subbands implements AudioCompressionType {
 	float[][][][] windows;
 	
 	public Subbands(RawAudio audio, int nBands) {
-		sampleRate = audio.getSampleRate();
+		sampleRate = (int)audio.getSampleRate();
 		nWindows = audio.getNWindows();
-		//samplesPerWindow = (int)(audio.getSamplesPerWindow()/nBands);
-		samplesPerWindow = (int)(audio.getSamplesPerWindow());
+		samplesPerWindow = (int)(audio.getSamplesPerWindow()/nBands);
+		//samplesPerWindow = (int)(audio.getSamplesPerWindow());
 		windowOverlap = audio.getWindowOverlap();
 		nChannels = audio.getNChannels();
 		this.nBands = nBands;
 		windows = new float[nChannels][nBands][nWindows][samplesPerWindow];
 	}
 	
-	public float getSampleRate(){
+	public int getSampleRate(){
 		return sampleRate;
 	}
 	
@@ -53,11 +53,9 @@ public class Subbands implements AudioCompressionType {
 		return nBands;
 	}
 	
-	public void setWindowArray(int chan, int band, int window, float[] val){
+	public void putWindow(int chan, int band, int window, float[] val){
 		if(val.length != samplesPerWindow)
 			throw new IllegalArgumentException("Subbands: Require val.length==samplesPerWindow");
-		
-		System.out.println("Setting subbands array " + chan + ", " + band + ", " + window + ": " + val.length);
 		windows[chan][band][window] = val;
 	}
 	

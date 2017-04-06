@@ -1,25 +1,40 @@
 package audioCompression.algorithm;
 
+import java.awt.Color;
+
 import edu.mines.jtk.mosaic.PlotFrame;
 import edu.mines.jtk.mosaic.PlotPanel;
+import edu.mines.jtk.mosaic.PointsView;
 import audioCompression.algorithm.dsp.window.HammingWindow;
 import audioCompression.algorithm.dsp.window.HannWindow;
 import audioCompression.algorithm.dsp.window.KaiserWindow;
 import audioCompression.algorithm.dsp.window.RectangleWindow;
 import audioCompression.types.Subbands;
+import audioCompression.types.WavAudioOutput;
 import audioCompression.types.testImpls.RawAudioImpl;
 
 public class FilterBankStepDemo {
 	
+	private static Color[] colors = new Color[] 
+			{
+		Color.ORANGE, 
+		Color.BLUE, 
+		Color.RED, 
+		Color.GREEN, 
+		Color.CYAN, 
+		Color.MAGENTA, 
+		Color.YELLOW};
+	
 	public static void main(String[] args){
 		
-		int nbands = 2;
+		int nbands = 4;
 		
 		// apply to audio test
 		RawAudioImpl audio = new RawAudioImpl(500, 500, 0);
-		FilterBankStep fb = new FilterBankStep(nbands, new KaiserWindow(2000,0.1f));
+		FilterBankStep fb = new FilterBankStep(nbands, new HannWindow(2048));
 		
 		Subbands sub = fb.forward(audio);
+		WavAudioOutput output = (WavAudioOutput)fb.reverse(sub);
 		
 		System.out.println(sub.getAllWindows().length);
 		System.out.println(sub.getAllWindows()[0].length);
@@ -33,14 +48,20 @@ public class FilterBankStepDemo {
 		
 		for(int i=0; i<sub.getNWindows(); i++)
 			for(int j=0; j<sub.getSamplesPerWindow(); j++)
-				for(int b=0; b<nbands; b++)
+				for(int b=0; b<nbands; b++){
 					bands[b][j + i*sub.getSamplesPerWindow()] = allWindows[0][b][i][j];
+				}
 		
 		PlotFrame plot = new PlotFrame(new PlotPanel(1,1));
 		
-		for(int i=0; i<nbands; i++)
-			plot.getPlotPanel().addPoints(bands[i]);
-		//plot.getPlotPanel().addPoints(audio.getAudioBuffer((int)audio.getNSamples())[0]);
+		/*for(int i=0; i<nbands; i++){
+			PointsView pv = plot.getPlotPanel().addPoints(bands[i]);
+			pv.setLineColor(colors[i%colors.length]);
+		}
+		*/
+		plot.getPlotPanel().addPoints(audio.getAudioBuffer((int)audio.getNSamples())[0]);
+		PointsView pv = plot.getPlotPanel().addPoints(output.getAllWindows()[0][0]);
+		pv.setLineColor(Color.red);
 		plot.setSize(500, 400);
 		plot.setDefaultCloseOperation(PlotFrame.EXIT_ON_CLOSE);
 		plot.setVisible(true);

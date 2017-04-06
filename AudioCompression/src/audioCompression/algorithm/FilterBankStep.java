@@ -1,6 +1,6 @@
 package audioCompression.algorithm;
 
-import java.util.Arrays;
+import java.sql.NClob;
 import java.util.Iterator;
 
 import audioCompression.algorithm.dsp.CosineModulatedFilterBank;
@@ -9,6 +9,7 @@ import audioCompression.algorithm.dsp.window.Window;
 import audioCompression.types.AudioCompressionType;
 import audioCompression.types.RawAudio;
 import audioCompression.types.Subbands;
+import audioCompression.types.WavAudioOutput;
 
 public class FilterBankStep implements AlgorithmStep<RawAudio, Subbands> {
 
@@ -34,7 +35,7 @@ public class FilterBankStep implements AlgorithmStep<RawAudio, Subbands> {
 		int windowCount = 0;
 		Subbands subbands = new Subbands(input, nBands);
 		if(filterBank==null){
-			w.setLength((int)input.getSamplesPerWindow());
+			w.setLength((int)subbands.getSamplesPerWindow());
 			filterBank = new CosineModulatedFilterBank(nBands, w);
 		}
 		
@@ -43,47 +44,42 @@ public class FilterBankStep implements AlgorithmStep<RawAudio, Subbands> {
 			float[][] nextWindow = iter.next();
 
 			for(int i=0; i<input.getNChannels(); i++){
-				float[][] channelized = filterBank.applyFilters(nextWindow[i]);
-				//System.out.println("channeized result: " + channelized.length + ", " + channelized[0].length);
-				//float[][] channelized = new float[1][];
-				//channelized[0] = nextWindow[i];
-				
+				float[][] channelized = filterBank.analysisDecimated(nextWindow[i]);
 				for(int j=0; j<nBands; j++)
-					subbands.setWindowArray(i, j, windowCount, channelized[j]);
+					subbands.putWindow(i, j, windowCount, channelized[j]);
 			}
 			windowCount++;
 		}
 		
-		System.out.println(Arrays.toString(subbands.getAllWindows()[0][0][0]));
 		return subbands;
 	}
 
 	@Override
 	public RawAudio reverse(Subbands input) {
-		/*
 		Iterator<float[][][]> iter = input.getWindowIterator();
 		int windowCount = 0;
-		WavAudio out = new WavAudio(samplesPerWindow, windowOverlap);
 		
 		if(filterBank==null){
 			w.setLength(input.getSamplesPerWindow());
 			filterBank = new CosineModulatedFilterBank(nBands, w);
 		}
 		
+		float[][][] windows = new float[input.getNChannels()][][];
+		for(int i=0; i<input.getNChannels(); i++)
+			windows[i] = new float[input.getNWindows()][];
+		
 		while(iter.hasNext()){
 			
 			float[][][] nextWindow = iter.next();
 			
 			for(int i=0; i<input.getNChannels(); i++){
-				float[][] channelized = filterBank.applyFilters(nextWindow[i]);
-				for(int j=0; j<nBands; j++)
-					subbands.setWindowArray(i, j, windowCount, channelized[j]);
+				windows[i][windowCount] = filterBank.synthesis(nextWindow[i]);
 			}
 			
 		}
-		return subbands;
-		*/
-		return null;
+		WavAudioOutput out = 
+				new WavAudioOutput(windows, input.getWindowOverlap(), input.getSampleRate());
+		return out;
 	}
 
 	@Override

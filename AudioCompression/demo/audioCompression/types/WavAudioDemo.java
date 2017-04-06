@@ -13,7 +13,7 @@ public class WavAudioDemo {
 	public static void main(String[] args){
 		String filename = "../src_wavs/nokia_tune.wav";
 		int nsamps = 48000/32;
-		WavAudio wav = new WavAudio(new File(filename), nsamps, nsamps/10);
+		WavAudioInput wav = new WavAudioInput(new File(filename), nsamps, nsamps/10);
 		
 		System.out.println("file " + filename + " stats:");
 		System.out.println("-- sample rate: " + wav.getSampleRate() + " samples per second");

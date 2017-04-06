@@ -8,7 +8,7 @@ import java.util.Iterator;
 import libs.wavParser.WavFile;
 import libs.wavParser.WavFileException;
 
-public class WavAudio implements RawAudio{
+public class WavAudioInput implements RawAudio{
 
 	private WavFile wavFile;
 	private long nSamples;             // total number of samples (per channel) in the audio file 
@@ -17,7 +17,7 @@ public class WavAudio implements RawAudio{
 	private int windowOverlap;       // percentage of window overlap
 	private File inputFile;
 	
-	public WavAudio(File inputFile, int samplesPerWindow, int windowOverlap) {
+	public WavAudioInput(File inputFile, int samplesPerWindow, int windowOverlap) {
 		try {
 			this.inputFile = inputFile;
 			this.wavFile = WavFile.openWavFile(inputFile);

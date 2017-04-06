@@ -19,18 +19,38 @@ public class CosineModulatedFilterBank {
 		makeFilters();
 	}
 	
-	public float[][] applyFilters(float in[]){
+	public float[][] analysis(float in[]){
 		float[][] out = new float[nBands][];
 		
 		for(int i=0; i<nBands; i++){
-			//System.out.println("-- " + Arrays.toString(decimatedFilters[i].getCoefficients()));
-			//out[i] = decimatedFilters[i].applyTimeDomain(downsample(in, i));
 			out[i] = filters[i].applyTimeDomain(in);
-			//System.out.println(Arrays.toString(out[i]));
 		}
 		
 		return out;
 	}
+	
+	public float[][] analysisDecimated(float in[]){
+		float[][] out = new float[nBands][];
+		
+		for(int i=0; i<nBands; i++){
+			out[i] = decimatedFilters[i].applyTimeDomain(downsample(in, i));
+		}
+		
+		return out;
+	}
+	
+	public float[] synthesis(float in[][]){
+		float[] out = new float[in[0].length*in.length];
+		
+		for(int i=0; i<nBands; i++){
+			float[] filt = new float[in[i].length];
+			filt = decimatedFilters[i].applyTimeDomainReverse(in[i]);
+			for(int j=0; j<in[i].length; j++)
+				out[i+j*nBands] = filt[j];
+		}
+		
+		return out;
+	}	
 	
 	public Filter[] getFilters() {
 		return filters;
@@ -44,9 +64,9 @@ public class CosineModulatedFilterBank {
 
 		for(int k=0; k<N; k++){
 			float[] filter = new float[M];
-			double phi_k = (k)*(L+1)*Math.PI/2.0;
+			double phi_k = (k+0.5)*(L+1)*Math.PI/2.0;
 			for(int n=0; n<M; n++){
-				double phi = (k)*(n-(M-1)/2.0)*Math.PI/N;
+				double phi = (k+0.5)*(n-(M-1)/2.0)*Math.PI/(N);
 				filter[n] = (float)(h0[n]*Math.cos(phi+phi_k));
 			}
 			filters[k] = FilterFactory.makeFilter(filter);
