@@ -123,4 +123,9 @@ public class RawAudioImpl implements RawAudio{
 		return iter;
 	}
 
+	@Override
+	public int getByteDepth() {
+		return 4;
+	}
+
 }

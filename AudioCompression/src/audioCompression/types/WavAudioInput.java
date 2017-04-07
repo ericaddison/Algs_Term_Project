@@ -15,6 +15,7 @@ public class WavAudioInput implements RawAudio{
 	private int nWindows;             // total number of windows (including the overlap)
 	private int samplesPerWindow;      // number of samples per window
 	private int windowOverlap;       // percentage of window overlap
+	private int byteDepth;
 	private File inputFile;
 	
 	public WavAudioInput(File inputFile, int samplesPerWindow, int windowOverlap) {
@@ -22,6 +23,7 @@ public class WavAudioInput implements RawAudio{
 			this.inputFile = inputFile;
 			this.wavFile = WavFile.openWavFile(inputFile);
 			nSamples = wavFile.getNumFrames();
+			this.byteDepth = (wavFile.getValidBits()+7)/8;
 			
 			this.samplesPerWindow = samplesPerWindow;
 			
@@ -163,6 +165,11 @@ public class WavAudioInput implements RawAudio{
 					windowBuffer[i][j] = windowBuffer[i][(j+windowOverlap)];
 		}
 		
+	}
+
+	@Override
+	public int getByteDepth() {
+		return byteDepth;
 	}
 
 }

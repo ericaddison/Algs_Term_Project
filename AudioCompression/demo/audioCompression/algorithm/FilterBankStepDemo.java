@@ -10,6 +10,7 @@ import audioCompression.algorithm.dsp.window.HammingWindow;
 import audioCompression.algorithm.dsp.window.HannWindow;
 import audioCompression.algorithm.dsp.window.KaiserWindow;
 import audioCompression.algorithm.dsp.window.RectangleWindow;
+import audioCompression.types.AudioByteBuffer;
 import audioCompression.types.Subbands;
 import audioCompression.types.WavAudioOutput;
 import audioCompression.types.testImpls.RawAudioImpl;
@@ -28,7 +29,7 @@ public class FilterBankStepDemo {
 	
 	public static void main(String[] args){
 		
-		int nbands = 4;
+		int nbands = 2;
 		int fN = 2*512;
 		
 		// apply to audio test
@@ -36,6 +37,27 @@ public class FilterBankStepDemo {
 		//FilterBankStep fb = new FilterBankStep(nbands, new HannWindow(fN));
 		FilterBankStep fb = new FilterBankStep(nbands, new HannWindow(fN));
 		//FilterBankStep fb = new FilterBankStep(nbands, new KaiserWindow(fN,0.05f));
+		SubbandsByteBufferizerStep sbb = new SubbandsByteBufferizerStep();
+		
+		long t1 = System.currentTimeMillis();
+		Subbands sub = fb.forward(audio);
+		long t2 = System.currentTimeMillis();
+		System.out.println("filterbank forward time: " + (t2-t1) + "ms");
+		
+		t1 = System.currentTimeMillis();
+		AudioByteBuffer abb = sbb.forward(sub);
+		t2 = System.currentTimeMillis();
+		System.out.println("bufferizer forward time: " + (t2-t1) + "ms");
+		
+		t1 = System.currentTimeMillis();
+		Subbands sub2 = sbb.reverse(abb);
+		t2 = System.currentTimeMillis();
+		System.out.println("bufferizer reverse time: " + (t2-t1) + "ms");
+		
+		t1 = System.currentTimeMillis();
+		WavAudioOutput output = (WavAudioOutput)fb.reverse(sub2);
+		t2 = System.currentTimeMillis();
+		System.out.println("filterbank reverse: " + (t2-t1) + "ms");
 		
 		Subbands sub = fb.forward(audio, "subBandsForw");
 		WavAudioOutput output = (WavAudioOutput)fb.reverse(sub, "subBandsRev");

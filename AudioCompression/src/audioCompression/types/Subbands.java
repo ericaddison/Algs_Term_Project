@@ -11,6 +11,7 @@ public class Subbands implements AudioCompressionType {
 	int windowOverlap;
 	int nChannels;
 	int nBands;
+	int byteDepth;
 	float[][][][] windows;
 	
 	public Subbands(RawAudio audio, int nBands) {
@@ -21,9 +22,27 @@ public class Subbands implements AudioCompressionType {
 		windowOverlap = audio.getWindowOverlap();
 		nChannels = audio.getNChannels();
 		this.nBands = nBands;
+		this.byteDepth = audio.getByteDepth();
 		windows = new float[nChannels][nBands][nWindows][samplesPerWindow];
 	}
 	
+
+	
+	public Subbands(int sampleRate, int nWindows, int samplesPerWindow,
+			int windowOverlap, int nChannels, int nBands, int byteDepth, float[][][][] windows) {
+		super();
+		this.sampleRate = sampleRate;
+		this.nWindows = nWindows;
+		this.samplesPerWindow = samplesPerWindow;
+		this.windowOverlap = windowOverlap;
+		this.nChannels = nChannels;
+		this.nBands = nBands;
+		this.windows = windows;
+		this.byteDepth = byteDepth;
+	}
+
+
+
 	public int getSampleRate(){
 		return sampleRate;
 	}
@@ -51,6 +70,10 @@ public class Subbands implements AudioCompressionType {
 	
 	public int getNBands(){
 		return nBands;
+	}
+	
+	public int getByteDepth(){
+		return byteDepth;
 	}
 	
 	public void putWindow(int chan, int band, int window, float[] val){

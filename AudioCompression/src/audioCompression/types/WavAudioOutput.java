@@ -17,15 +17,17 @@ public class WavAudioOutput implements RawAudio{
 	private int samplesPerWindow;      // number of samples per window
 	private int windowOverlap;       // percentage of window overlap
 	private int sampleRate;
+	private int byteDepth;
 	private float[][][] windows;
 	
-	public WavAudioOutput(float[][][] windows, int windowOverlap, int sampleRate) {
+	public WavAudioOutput(float[][][] windows, int windowOverlap, int sampleRate, int byteDepth) {
 		this.nWindows = windows[0].length;
 		this.samplesPerWindow = windows[0][0].length;
 		this.windowOverlap = windowOverlap;
 		this.nChannels = windows.length;
 		this.sampleRate = sampleRate;
 		this.windows = windows;
+		this.byteDepth = byteDepth;
 	}
 	
 	@Override
@@ -96,6 +98,11 @@ public class WavAudioOutput implements RawAudio{
 			return null;
 		}
 		
+	}
+
+	@Override
+	public int getByteDepth() {
+		return byteDepth;
 	}
 
 }
