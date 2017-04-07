@@ -28,13 +28,14 @@ public class FilterBankStepDemo {
 	
 	public static void main(String[] args){
 		
-		int nbands = 8;
+		int nbands = 4;
 		int fN = 2*512;
 		
 		// apply to audio test
-		RawAudioImpl audio = new RawAudioImpl(1000, 1000, 0);
-		FilterBankStep fb = new FilterBankStep(nbands, new HammingWindow(fN));
-		//FilterBankStep fb = new FilterBankStep(nbands, new KaiserWindow(fN,0.005f));
+		RawAudioImpl audio = new RawAudioImpl(300, 300, 0);
+		//FilterBankStep fb = new FilterBankStep(nbands, new HannWindow(fN));
+		FilterBankStep fb = new FilterBankStep(nbands, new HannWindow(fN));
+		//FilterBankStep fb = new FilterBankStep(nbands, new KaiserWindow(fN,0.05f));
 		
 		Subbands sub = fb.forward(audio);
 		WavAudioOutput output = (WavAudioOutput)fb.reverse(sub);

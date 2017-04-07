@@ -13,6 +13,7 @@ public class CosineModulatedFilterBank {
 		if(w.getLength()%nBands != 0)
 			w.setLength(w.getLength() + (nBands - w.getLength()%nBands));
 		this.prototypeFilter = FilterFactory.makeLowpassFilter(0.5f/(nBands), w);
+		System.out.println("Fiter length = " + w.getLength());
 		this.nBands = nBands;
 		filters = new Filter[nBands];
 		decimatedFilters = new Filter[nBands];

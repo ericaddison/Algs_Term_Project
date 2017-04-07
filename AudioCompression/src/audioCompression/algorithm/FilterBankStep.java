@@ -45,8 +45,8 @@ public class FilterBankStep implements AlgorithmStep<RawAudio, Subbands> {
 
 			for(int i=0; i<input.getNChannels(); i++){
 				//float[] windowedInput = inputWindow.apply(nextWindow[i]);
-				//float[][] channelized = filterBank.analysisDecimated(nextWindow[i]);
-				float[][] channelized = filterBank.analysis(nextWindow[i]);
+				float[][] channelized = filterBank.analysisDecimated(nextWindow[i]);
+				//float[][] channelized = filterBank.analysis(nextWindow[i]);
 				for(int j=0; j<nBands; j++)
 					subbands.putWindow(i, j, windowCount, channelized[j]);
 			}
@@ -75,7 +75,8 @@ public class FilterBankStep implements AlgorithmStep<RawAudio, Subbands> {
 			float[][][] nextWindow = iter.next();
 			
 			for(int i=0; i<input.getNChannels(); i++){
-				windows[i][windowCount] = filterBank.synthesis(nextWindow[i]);
+				//windows[i][windowCount] = filterBank.synthesis(nextWindow[i]);
+				windows[i][windowCount] = filterBank.synthesisDecimated(nextWindow[i]);
 			}
 			
 		}
