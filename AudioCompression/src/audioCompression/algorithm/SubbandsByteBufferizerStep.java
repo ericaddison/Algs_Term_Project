@@ -41,9 +41,9 @@ public class SubbandsByteBufferizerStep implements AlgorithmStep<Subbands, Audio
 			for(int iband = 0; iband < nBands; iband++)
 				for(int iwin = 0; iwin < nWindows; iwin++)
 					for(int isamp = 0; isamp < samplesPerWindow; isamp++){
-						byte[] sampVal = 
+						byte[] sampBytes = 
 								float2bytes(samples[ichan][iband][iwin][isamp], byteDepth);
-						bytes.put(sampVal);
+						bytes.put(sampBytes);
 					}
 		
 		bytes.rewind();
@@ -61,7 +61,7 @@ public class SubbandsByteBufferizerStep implements AlgorithmStep<Subbands, Audio
 		int samplesPerWindow = input.getBuffer().getInt();
 		int windowOverlap = input.getBuffer().getInt();
 		int byteDepth = input.getBuffer().getInt();
-		
+
 		float[][][][] windows = new float[nChannels][nBands][nWindows][samplesPerWindow];
 		for(int ichan = 0; ichan < nChannels; ichan++)
 			for(int iband = 0; iband < nBands; iband++)
@@ -71,6 +71,7 @@ public class SubbandsByteBufferizerStep implements AlgorithmStep<Subbands, Audio
 						for(int i=0; i<byteDepth; i++)
 							nextVal[i] = input.getBuffer().get();
 						float f = bytes2float(nextVal, byteDepth);
+							
 						windows[ichan][iband][iwin][isamp] = f;
 					}		
 		
@@ -85,8 +86,7 @@ public class SubbandsByteBufferizerStep implements AlgorithmStep<Subbands, Audio
 	public static byte[] float2bytes(float f, int byteDepth) {
 		// clip at +/- 1
 		f = (float)(Math.max(Math.min(1, f),-1));
-		
-		int maxval = (1<<(8*byteDepth-1)) - 1;
+		int maxval = getMaxIntVal(byteDepth);
 		
 		// scale to int
 		int intVal = (int)(((f + 1)/2) * (maxval));
@@ -96,8 +96,9 @@ public class SubbandsByteBufferizerStep implements AlgorithmStep<Subbands, Audio
 		bb.putInt(intVal);
 		bb.rewind();
 		byte[] byteArray = new byte[byteDepth];
+		int offset = ((Integer.SIZE)/Byte.SIZE) - byteDepth;
 		for(int i=0; i<byteDepth; i++)
-			byteArray[i] = bb.get();
+			byteArray[i] = bb.get(i + offset);
 		return byteArray;
 	}
 	
@@ -106,9 +107,9 @@ public class SubbandsByteBufferizerStep implements AlgorithmStep<Subbands, Audio
 		int nFloatBytes = Float.SIZE/Byte.SIZE;
 		
 		ByteBuffer floatBytes = ByteBuffer.allocate(nFloatBytes);
-		floatBytes.put(b);
 		for(int i=0; i<(nFloatBytes-byteDepth); i++)
 			floatBytes.put((byte)0);
+		floatBytes.put(b);
 		
 
 		// get the int value
@@ -116,7 +117,7 @@ public class SubbandsByteBufferizerStep implements AlgorithmStep<Subbands, Audio
 		int intVal = floatBytes.getInt();
 		
 		// convert to float
-		int maxval = (1<<(8*byteDepth-1)) - 1;
+		int maxval = getMaxIntVal(byteDepth);
 		float f = (2.0f*intVal)/maxval - 1;
 		
 		return f;
@@ -144,14 +145,22 @@ public class SubbandsByteBufferizerStep implements AlgorithmStep<Subbands, Audio
 		
 		
 		float f = -0.147f;
-		byte[] b = float2bytes(f, 3);
-		float f2 = bytes2float(b, 3);
+		int byteDepth = 2;
+		byte[] b = float2bytes(f, byteDepth);
+		float f2 = bytes2float(b, byteDepth);
 		System.out.println("my float: " + f);
 		System.out.println("To bytes: " + Arrays.toString(b));
-		System.out.println("BAck to float: " + f2); 
+		System.out.println("BAck to float: " + f2);
+		System.out.println("maxval = " + getMaxIntVal(byteDepth));
+
 		
 		
 		
+	}
+
+
+	private static int getMaxIntVal(int byteDepth) {
+		return (Integer.MAX_VALUE)>>((Integer.SIZE)-byteDepth*8);
 	}
 	
 }

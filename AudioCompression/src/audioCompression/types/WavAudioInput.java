@@ -85,7 +85,6 @@ public class WavAudioInput implements RawAudio{
 	}	
 	
 	@Override
-	// only returns the first audio channel...
 	public float[][] getAudioBuffer(int samp2) {
 		try {
 			wavFile = WavFile.openWavFile(inputFile);
@@ -148,7 +147,7 @@ public class WavAudioInput implements RawAudio{
 				// shift data in current window
 				shiftWindow();
 				// read new frames
-				myWavFile.readFrames(windowBuffer, windowOverlap, windowIncrement);
+				myWavFile.readFrames(windowBuffer, windowIncrement, windowOverlap);
 				float[][] windowCopy = new float[getNChannels()][];
 				for(int i=0; i<windowCopy.length; i++)
 					windowCopy[i] = Arrays.copyOf(windowBuffer[i],windowBuffer[i].length);

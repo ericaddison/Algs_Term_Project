@@ -1,7 +1,12 @@
 package audioCompression.algorithm;
 
+import java.awt.Color;
 import java.sql.NClob;
 import java.util.Iterator;
+
+import edu.mines.jtk.mosaic.PlotFrame;
+import edu.mines.jtk.mosaic.PlotPanel;
+import edu.mines.jtk.mosaic.PointsView;
 
 import audioCompression.algorithm.dsp.CosineModulatedFilterBank;
 import audioCompression.algorithm.dsp.window.HannWindow;
@@ -41,14 +46,21 @@ public class FilterBankStep implements AlgorithmStep<RawAudio, Subbands> {
 		
 		while(iter.hasNext()){
 			
+			if(windowCount == input.getNWindows()){
+				System.out.println("oh no!");
+				break;
+			}
+			
 			float[][] nextWindow = iter.next();
 
 			for(int i=0; i<input.getNChannels(); i++){
 				//float[] windowedInput = inputWindow.apply(nextWindow[i]);
 				float[][] channelized = filterBank.analysisDecimated(nextWindow[i]);
+				
 				//float[][] channelized = filterBank.analysis(nextWindow[i]);
 				for(int j=0; j<nBands; j++)
 					subbands.putWindow(i, j, windowCount, channelized[j]);
+				
 			}
 			windowCount++;
 		}
@@ -66,9 +78,7 @@ public class FilterBankStep implements AlgorithmStep<RawAudio, Subbands> {
 			filterBank = new CosineModulatedFilterBank(nBands, w);
 		}
 		
-		float[][][] windows = new float[input.getNChannels()][][];
-		for(int i=0; i<input.getNChannels(); i++)
-			windows[i] = new float[input.getNWindows()][];
+		float[][][] windows = new float[input.getNChannels()][input.getNWindows()][input.getSamplesPerWindow()];
 		
 		while(iter.hasNext()){
 			
@@ -77,8 +87,9 @@ public class FilterBankStep implements AlgorithmStep<RawAudio, Subbands> {
 			for(int i=0; i<input.getNChannels(); i++){
 				//windows[i][windowCount] = filterBank.synthesis(nextWindow[i]);
 				windows[i][windowCount] = filterBank.synthesisDecimated(nextWindow[i]);
-			}
+			} 
 			
+			windowCount++;
 		}
 		WavAudioOutput out = 
 				new WavAudioOutput(windows, input.getWindowOverlap(), 
