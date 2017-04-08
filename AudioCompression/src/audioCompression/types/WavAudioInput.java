@@ -130,7 +130,7 @@ public class WavAudioInput implements RawAudio{
 				windowBuffer = new float[myWavFile.getNumChannels()][(int)samplesPerWindow];
 				windowIncrement = samplesPerWindow-windowOverlap;
 				// pre-populate window
-				myWavFile.readFrames(windowBuffer, windowOverlap, windowIncrement);
+				myWavFile.readFrames(windowBuffer, 0, windowOverlap);
 			} catch (IOException | WavFileException e) {
 				e.printStackTrace();
 			}
@@ -147,7 +147,7 @@ public class WavAudioInput implements RawAudio{
 				// shift data in current window
 				shiftWindow();
 				// read new frames
-				myWavFile.readFrames(windowBuffer, windowIncrement, windowOverlap);
+				myWavFile.readFrames(windowBuffer, windowIncrement);
 				float[][] windowCopy = new float[getNChannels()][];
 				for(int i=0; i<windowCopy.length; i++)
 					windowCopy[i] = Arrays.copyOf(windowBuffer[i],windowBuffer[i].length);
@@ -160,8 +160,8 @@ public class WavAudioInput implements RawAudio{
 		
 		private void shiftWindow(){
 			for(int i=0; i<myWavFile.getNumChannels(); i++)
-				for(int j=0; j<windowIncrement; j++)
-					windowBuffer[i][j] = windowBuffer[i][(j+windowOverlap)];
+				for(int j=0; j<windowOverlap; j++)
+					windowBuffer[i][(j+windowIncrement)] = windowBuffer[i][j];
 		}
 		
 	}

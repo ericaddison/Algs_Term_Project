@@ -39,7 +39,7 @@ public class FilterBankStepDemo {
 		//RawAudioImpl audio = new RawAudioImpl(1000, 500, 0);
 		String filename = "../src_wavs/nokia_tune.wav";
 		int nsamps = 48000/32;
-		WavAudioInput audio = new WavAudioInput(new File(filename), 2048*nbands, 0);
+		WavAudioInput audio = new WavAudioInput(new File(filename), 20000, 0);
 		//System.out.println(audio.getNSamples());
 		FilterBankStep fb = new FilterBankStep(nbands, new HannWindow(fN));
 		//FilterBankStep fb = new FilterBankStep(nbands, new HannWindow(fN));
@@ -79,7 +79,7 @@ public class FilterBankStepDemo {
 		System.out.println("byte depth = " + sub2.getByteDepth());
 		
 		
-		float[][] bands = new float[nbands][sub.getNWindows()*sub.getSamplesPerWindow()];
+		float[][] bands = new float[nbands][sub2.getNWindows()*sub2.getSamplesPerWindow()];
 		
 		for(int i=0; i<sub2.getNWindows(); i++)
 			for(int j=0; j<sub2.getSamplesPerWindow(); j++)
@@ -88,9 +88,10 @@ public class FilterBankStepDemo {
 				}
 		
 		PlotFrame plot = new PlotFrame(new PlotPanel(1,1));
-		
-		/*for(int i=0; i<nbands; i++){
-			PointsView pv = plot.getPlotPanel().addPoints(bands[i]);
+
+		/*
+		for(int i=0; i<output.getNWindows(); i++){
+			PointsView pv = plot.getPlotPanel().addPoints(output.getAllWindows()[0][i]);
 			pv.setLineColor(colors[i%colors.length]);
 		}
 		*/
@@ -99,7 +100,8 @@ public class FilterBankStepDemo {
 		float[][] firstWin = iter.next();
 		
 		plot.getPlotPanel().addPoints(audio.getAudioBuffer((int)audio.getNSamples())[0]);
-		PointsView pv = plot.getPlotPanel().addPoints(output.getAllWindows()[0][0]);
+		PointsView pv = plot.getPlotPanel().addPoints(output.getAllWindows()[0][6]);
+		//PointsView pv = plot.getPlotPanel().addPoints(sub.getAllWindows()[0][0][10]);
 		//PointsView pv = plot.getPlotPanel().addPoints(sub2.getAllWindows()[0][0][1]);
 		//PointsView pv = plot.getPlotPanel().addPoints(firstWin[0]);
 		pv.setLineColor(Color.red);

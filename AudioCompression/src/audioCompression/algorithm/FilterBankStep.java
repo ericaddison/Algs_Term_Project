@@ -1,12 +1,6 @@
 package audioCompression.algorithm;
 
-import java.awt.Color;
-import java.sql.NClob;
 import java.util.Iterator;
-
-import edu.mines.jtk.mosaic.PlotFrame;
-import edu.mines.jtk.mosaic.PlotPanel;
-import edu.mines.jtk.mosaic.PointsView;
 
 import audioCompression.algorithm.dsp.CosineModulatedFilterBank;
 import audioCompression.algorithm.dsp.window.HannWindow;
@@ -43,7 +37,6 @@ public class FilterBankStep implements AlgorithmStep<RawAudio, Subbands> {
 			filterBank = new CosineModulatedFilterBank(nBands, w);
 		
 		//Window inputWindow = new HannWindow((int)input.getSamplesPerWindow());
-		
 		while(iter.hasNext()){
 			
 			if(windowCount == input.getNWindows()){
@@ -55,6 +48,7 @@ public class FilterBankStep implements AlgorithmStep<RawAudio, Subbands> {
 
 			for(int i=0; i<input.getNChannels(); i++){
 				//float[] windowedInput = inputWindow.apply(nextWindow[i]);
+				System.out.println("Fist val of nextWindow[i] = " + nextWindow[i][0]);
 				float[][] channelized = filterBank.analysisDecimated(nextWindow[i]);
 				
 				//float[][] channelized = filterBank.analysis(nextWindow[i]);

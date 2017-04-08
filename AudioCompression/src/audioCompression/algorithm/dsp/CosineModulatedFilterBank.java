@@ -63,6 +63,8 @@ public class CosineModulatedFilterBank {
 		for(int i=0; i<nBands; i++){
 			float[] filt = new float[in[i].length];
 			filt = decimatedFilters[i].applyTimeDomainReverse(in[i]);
+			
+			// upsample
 			for(int j=0; j<in[i].length; j++)
 				out[i+j*nBands] = filt[j];
 		}
