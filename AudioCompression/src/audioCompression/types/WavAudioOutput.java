@@ -1,12 +1,9 @@
 package audioCompression.types;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 
 import libs.wavParser.WavFile;
-import libs.wavParser.WavFileException;
 
 public class WavAudioOutput implements RawAudio{
 
@@ -72,7 +69,42 @@ public class WavAudioOutput implements RawAudio{
 	
 	@Override
 	public float[][] getAudioBuffer(int samp2) {
-		return null;
+		float[][] buffer = new float[nChannels][samp2];
+		WindowIterator iter = new WindowIterator();
+		
+		// prepopulate with first window
+		for(int ichan=0; ichan<nChannels; ichan++){
+			float[][] nextWin = iter.next();
+			for(int i=0; i<samplesPerWindow; i++)
+				buffer[ichan][i] = nextWin[ichan][i];
+		}
+
+		System.out.println("Overlap = " + windowOverlap);
+		
+		int sampsWritten = samplesPerWindow;
+		while(iter.hasNext() && sampsWritten<samp2){
+			float[][] nextWin = iter.next();
+			sampsWritten -= windowOverlap;
+			int nsamps = Math.min(samp2-sampsWritten, samplesPerWindow);
+
+			for(int ichan=0; ichan<nChannels; ichan++){
+			
+				// do overlap zone
+				for(int i=0; i<windowOverlap; i++){
+					buffer[ichan][sampsWritten] += nextWin[ichan][i];
+					buffer[ichan][sampsWritten] /= 2.0f;
+					sampsWritten ++;
+				}
+				
+				// no overlap zone
+				for(int i=windowOverlap; i<nsamps; i++){
+					buffer[ichan][sampsWritten] = nextWin[ichan][i];
+					sampsWritten ++;
+				}
+					
+			}
+		}
+		return buffer;
 	}
 	
 	@Override
@@ -82,20 +114,23 @@ public class WavAudioOutput implements RawAudio{
 
 	private class WindowIterator implements Iterator<float[][]>{
 		
-		private float[][] windowBuffer;
-		private int windowIncrement;
+		private int windowCount=0;
 		
 		public WindowIterator() {
 		}
 		
 		@Override
 		public boolean hasNext() {
-			return false;
+			return windowCount<nWindows;
 		}
 
 		@Override
 		public float[][] next() {
-			return null;
+			float[][] nextWin = new float[nChannels][];
+			for(int i=0; i<nChannels; i++)
+				nextWin[i] = Arrays.copyOf(windows[i][windowCount], samplesPerWindow);
+			windowCount++;
+			return nextWin;
 		}
 		
 	}

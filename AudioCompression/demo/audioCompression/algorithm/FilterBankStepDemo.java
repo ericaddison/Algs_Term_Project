@@ -32,15 +32,27 @@ public class FilterBankStepDemo {
 	
 	public static void main(String[] args){
 		
-		int nbands = 8;
-		int fN = 2*512;
+		int nbands = 16;
+		int fN = 4*512;
+		
+		// I think there might be some offset problem with too many bands!!!
 		
 		// apply to audio test
 		//RawAudioImpl audio = new RawAudioImpl(1000, 500, 0);
 		String filename = "../src_wavs/nokia_tune.wav";
 		int nsamps = 48000/32;
-		WavAudioInput audio = new WavAudioInput(new File(filename), 20000, 0);
-		//System.out.println(audio.getNSamples());
+		
+		// ??? the error in alignment between the output and input seems to be
+		// based on the window size. I think it's a problem with the audioOutput
+		// window function, but not sure...
+		// ALSO based on nbands.....
+		
+		int winSize = 50*nbands;
+		int winOverlap = 0;
+		
+		if(winSize%nbands>0)
+			System.out.println("WARNING! winsize and overlap incompatible!");
+		WavAudioInput audio = new WavAudioInput(new File(filename), winSize, winOverlap);
 		FilterBankStep fb = new FilterBankStep(nbands, new HannWindow(fN));
 		//FilterBankStep fb = new FilterBankStep(nbands, new HannWindow(fN));
 		//FilterBankStep fb = new FilterBankStep(nbands, new KaiserWindow(fN,0.05f));
@@ -77,15 +89,11 @@ public class FilterBankStepDemo {
 		float[][][][] allWindows = sub2.getAllWindows();
 
 		System.out.println("byte depth = " + sub2.getByteDepth());
+
+		float rmsDiff = rmsDiff(audio.getAudioBuffer((int)audio.getNSamples())[0], 
+				output.getAudioBuffer((int)audio.getNSamples())[0]);
+		System.out.println("rmsDiff: " + rmsDiff);
 		
-		
-		float[][] bands = new float[nbands][sub2.getNWindows()*sub2.getSamplesPerWindow()];
-		
-		for(int i=0; i<sub2.getNWindows(); i++)
-			for(int j=0; j<sub2.getSamplesPerWindow(); j++)
-				for(int b=0; b<nbands; b++){
-					bands[b][j + i*sub2.getSamplesPerWindow()] = allWindows[0][b][i][j];
-				}
 		
 		PlotFrame plot = new PlotFrame(new PlotPanel(1,1));
 
@@ -99,9 +107,16 @@ public class FilterBankStepDemo {
 		Iterator<float[][]> iter = audio.getWindowIterator();
 		float[][] firstWin = iter.next();
 		
+		float[] firstHalf = output.getAudioBuffer((int)audio.getNSamples()/2)[0];
 		plot.getPlotPanel().addPoints(audio.getAudioBuffer((int)audio.getNSamples())[0]);
-		PointsView pv = plot.getPlotPanel().addPoints(output.getAllWindows()[0][6]);
-		//PointsView pv = plot.getPlotPanel().addPoints(sub.getAllWindows()[0][0][10]);
+		PointsView pv = plot.getPlotPanel().addPoints(firstHalf);
+		
+		int iwin = 100;
+		
+		//plot.getPlotPanel().addPoints(audio.getAllWindows()[0][iwin]);
+		//PointsView pv = plot.getPlotPanel().addPoints(output.getAllWindows()[0][iwin]);
+		
+		//PointsView pv = plot.getPlotPanel().addPoints(sub.getAllWindows()[0][0][0]);
 		//PointsView pv = plot.getPlotPanel().addPoints(sub2.getAllWindows()[0][0][1]);
 		//PointsView pv = plot.getPlotPanel().addPoints(firstWin[0]);
 		pv.setLineColor(Color.red);
@@ -112,6 +127,21 @@ public class FilterBankStepDemo {
 	}
 	
 	
+	private static float[] padLeft(float[] arr, int nZeros){
+		float[] newArr = new float[arr.length + nZeros];
+		for(int i=nZeros; i<newArr.length; i++)
+			newArr[i] = arr[i-nZeros];
+		return newArr;
+	}
+	
+	private static float rmsDiff(float[] arr1, float[] arr2){
+		if(arr1.length!=arr2.length)
+			throw new IllegalArgumentException("arr1.length!=arr2.length");
+		float rms = 0;
+		for(int i=0; i<arr1.length; i++)
+			rms += (arr1[i] - arr2[i])*(arr1[i] - arr2[i]);
+		return (float)Math.sqrt(rms/arr1.length);
+	}
 	
 	
 }

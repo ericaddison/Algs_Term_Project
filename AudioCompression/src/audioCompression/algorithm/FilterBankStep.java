@@ -36,7 +36,6 @@ public class FilterBankStep implements AlgorithmStep<RawAudio, Subbands> {
 		if(filterBank==null)
 			filterBank = new CosineModulatedFilterBank(nBands, w);
 		
-		//Window inputWindow = new HannWindow((int)input.getSamplesPerWindow());
 		while(iter.hasNext()){
 			
 			if(windowCount == input.getNWindows()){
@@ -47,11 +46,9 @@ public class FilterBankStep implements AlgorithmStep<RawAudio, Subbands> {
 			float[][] nextWindow = iter.next();
 
 			for(int i=0; i<input.getNChannels(); i++){
-				//float[] windowedInput = inputWindow.apply(nextWindow[i]);
-				System.out.println("Fist val of nextWindow[i] = " + nextWindow[i][0]);
 				float[][] channelized = filterBank.analysisDecimated(nextWindow[i]);
-				
 				//float[][] channelized = filterBank.analysis(nextWindow[i]);
+
 				for(int j=0; j<nBands; j++)
 					subbands.putWindow(i, j, windowCount, channelized[j]);
 				
@@ -67,10 +64,8 @@ public class FilterBankStep implements AlgorithmStep<RawAudio, Subbands> {
 		Iterator<float[][][]> iter = input.getWindowIterator();
 		int windowCount = 0;
 		
-		if(filterBank==null){
-			w.setLength(input.getSamplesPerWindow());
+		if(filterBank==null)
 			filterBank = new CosineModulatedFilterBank(nBands, w);
-		}
 		
 		float[][][] windows = new float[input.getNChannels()][input.getNWindows()][input.getSamplesPerWindow()];
 		

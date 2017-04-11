@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 
+import audioCompression.algorithm.dsp.window.KbdWindow;
+import audioCompression.algorithm.dsp.window.Window;
+
 import libs.wavParser.WavFile;
 import libs.wavParser.WavFileException;
 
@@ -147,10 +150,11 @@ public class WavAudioInput implements RawAudio{
 				// shift data in current window
 				shiftWindow();
 				// read new frames
-				myWavFile.readFrames(windowBuffer, windowIncrement);
+				myWavFile.readFrames(windowBuffer, windowOverlap, windowIncrement);
 				float[][] windowCopy = new float[getNChannels()][];
-				for(int i=0; i<windowCopy.length; i++)
+				for(int i=0; i<windowCopy.length; i++){
 					windowCopy[i] = Arrays.copyOf(windowBuffer[i],windowBuffer[i].length);
+				}
 				return windowCopy;
 			} catch (IOException | WavFileException e) {
 				e.printStackTrace();
@@ -161,7 +165,7 @@ public class WavAudioInput implements RawAudio{
 		private void shiftWindow(){
 			for(int i=0; i<myWavFile.getNumChannels(); i++)
 				for(int j=0; j<windowOverlap; j++)
-					windowBuffer[i][(j+windowIncrement)] = windowBuffer[i][j];
+					windowBuffer[i][j] = windowBuffer[i][(j+windowIncrement)];
 		}
 		
 	}
