@@ -91,18 +91,17 @@ public class WavAudioOutput implements RawAudio{
 			
 				// do overlap zone
 				for(int i=0; i<windowOverlap; i++){
-					buffer[ichan][sampsWritten] += nextWin[ichan][i];
-					buffer[ichan][sampsWritten] /= 2.0f;
-					sampsWritten ++;
+					buffer[ichan][i+sampsWritten] += nextWin[ichan][i];
+					buffer[ichan][i+sampsWritten] /= 2.0f;
 				}
 				
 				// no overlap zone
 				for(int i=windowOverlap; i<nsamps; i++){
-					buffer[ichan][sampsWritten] = nextWin[ichan][i];
-					sampsWritten ++;
+					buffer[ichan][i+sampsWritten] = nextWin[ichan][i];
 				}
 					
 			}
+			sampsWritten += nsamps;
 		}
 		return buffer;
 	}
@@ -139,5 +138,5 @@ public class WavAudioOutput implements RawAudio{
 	public int getByteDepth() {
 		return byteDepth;
 	}
-
+	
 }

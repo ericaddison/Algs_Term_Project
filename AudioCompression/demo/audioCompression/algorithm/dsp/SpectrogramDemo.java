@@ -14,7 +14,7 @@ public static void main(String args[]){
 		int stftWindowLength = nSamps/100;
 		float overlap = 0.5f; 
 		
-		RawAudioImpl audio = new RawAudioImpl(nSamps, nSamps, 0);
+		RawAudioImpl audio = new RawAudioImpl(nSamps, nSamps, 0, 2);
 		
 		Spectrogram spec = new Spectrogram( 
 				(int)(stftWindowLength*overlap), 

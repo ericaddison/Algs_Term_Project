@@ -18,17 +18,21 @@ public class RawAudioImpl implements RawAudio{
 	private int overlap;
 	private int nwindows;
 	private int windowIncrement;
+	private int nchannels;
 	
-	public RawAudioImpl(int nSamps, int sampsPerWindow, int windowOverlap) {
+	public RawAudioImpl(int nSamps, int sampsPerWindow, int windowOverlap, int nchannels) {
 		if(windowOverlap>sampsPerWindow/2 || windowOverlap<0)
 			throw new IllegalArgumentException("RawAudioImpl: require 0<=windowOverlap<=sampsPerWindow/2");
 		this.sampsPerWindow = sampsPerWindow;
 		this.overlap = windowOverlap;
 		this.windowIncrement = (sampsPerWindow-windowOverlap);
-		this.nwindows = nSamps/windowIncrement;
+		this.nwindows = nSamps/windowIncrement+1;
+		nSamps = nwindows*windowIncrement + windowOverlap;
 		
+		System.out.println("I think I should have " + nwindows + " windows and " + nSamps + " samples");
+		this.nchannels = nchannels;
 		
-		buffer = new float[2][nSamps];
+		buffer = new float[nchannels][nSamps];
 		float f0 = 0.05f;
 		int nDivs = 2;
 		float df = 2*0.01f/nSamps * nDivs;
@@ -37,20 +41,20 @@ public class RawAudioImpl implements RawAudio{
 		for(int i=0; i<nSamps/nDivs; i++){
 			for(int j=0; j<nDivs/2; j++){
 				float ch1 = (float)Math.sin(2*Math.PI*i*(f0+f));
-				float ch2 = (float)Math.cos(2*Math.PI*i*(f0+f));
-				buffer[0][i+2*j*nSamps/nDivs] = ch1;
-				buffer[1][i+2*j*nSamps/nDivs] = ch2;
-				buffer[0][nSamps-(i+2*j*nSamps/nDivs)-1] = ch1;
-				buffer[1][nSamps-(i+2*j*nSamps/nDivs)-1] = ch2;
+				for(int k=0; k<nchannels; k++){
+					buffer[k][i+2*j*nSamps/nDivs] = ch1;
+					buffer[k][nSamps-(i+2*j*nSamps/nDivs)-1] = ch1;
+				}
 			}
 			f += df;
 		}
 		
-		windows = new float[2][nwindows][sampsPerWindow];
+		windows = new float[nchannels][nwindows][sampsPerWindow];
 		for(int i=0; i<nwindows; i++){
 			for(int j=0; j<sampsPerWindow; j++){
-				windows[0][i][j] = buffer[0][i*windowIncrement + j];
-				windows[1][i][j] = buffer[1][i*windowIncrement + j];
+				for(int k=0; k<nchannels; k++){
+					windows[k][i][j] = buffer[k][i*windowIncrement + j];
+				}
 			}
 		}
 	}
@@ -87,12 +91,16 @@ public class RawAudioImpl implements RawAudio{
 
 	@Override
 	public int getNChannels() {
-		return 2;
+		return nchannels;
 	}
 
 	@Override
 	public float[][] getAudioBuffer(int nsamples) {
-		return buffer;
+		float[][] newBuf = new float[nchannels][nsamples];
+		for(int ichan=0; ichan<nchannels; ichan++)
+			for(int j=0; j<nsamples; j++)
+				newBuf[ichan][j] = buffer[ichan][j];
+		return newBuf;
 	}
 
 	@Override
@@ -108,9 +116,9 @@ public class RawAudioImpl implements RawAudio{
 			
 			@Override
 			public float[][] next(){
-				float[][] nextWindow = new float[2][];
-				nextWindow[0] = Arrays.copyOf(windows[0][cnt],sampsPerWindow);
-				nextWindow[1] = Arrays.copyOf(windows[1][cnt],sampsPerWindow);
+				float[][] nextWindow = new float[nchannels][];
+				for(int k=0; k<nchannels; k++)
+					nextWindow[k] = Arrays.copyOf(windows[k][cnt],sampsPerWindow);
 				cnt++;
 				return nextWindow;
 			}
@@ -127,5 +135,4 @@ public class RawAudioImpl implements RawAudio{
 	public int getByteDepth() {
 		return 4;
 	}
-
 }

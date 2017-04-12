@@ -33,19 +33,14 @@ public class FilterBankStepDemo {
 	public static void main(String[] args){
 		
 		int nbands = 16;
-		int fN = 4*512;
+		int fN = 2*512;
 		
-		// I think there might be some offset problem with too many bands!!!
+		// I think there might be some offset problem with too many bands (or channels)!!!
 		
 		// apply to audio test
-		//RawAudioImpl audio = new RawAudioImpl(1000, 500, 0);
+		//RawAudioImpl audio = new RawAudioImpl(1000, 40*nbands, 00, 1);
 		String filename = "../src_wavs/nokia_tune.wav";
 		int nsamps = 48000/32;
-		
-		// ??? the error in alignment between the output and input seems to be
-		// based on the window size. I think it's a problem with the audioOutput
-		// window function, but not sure...
-		// ALSO based on nbands.....
 		
 		int winSize = 50*nbands;
 		int winOverlap = 0;
@@ -90,8 +85,9 @@ public class FilterBankStepDemo {
 
 		System.out.println("byte depth = " + sub2.getByteDepth());
 
-		float rmsDiff = rmsDiff(audio.getAudioBuffer((int)audio.getNSamples())[0], 
-				output.getAudioBuffer((int)audio.getNSamples())[0]);
+		int difflength = (int)audio.getNSamples();
+		float rmsDiff = rmsDiff(audio.getAudioBuffer(difflength)[0], 
+				output.getAudioBuffer(difflength)[0]);
 		System.out.println("rmsDiff: " + rmsDiff);
 		
 		
@@ -111,7 +107,10 @@ public class FilterBankStepDemo {
 		plot.getPlotPanel().addPoints(audio.getAudioBuffer((int)audio.getNSamples())[0]);
 		PointsView pv = plot.getPlotPanel().addPoints(firstHalf);
 		
-		int iwin = 100;
+		int iwin = 1;
+		float rmsDiffWin = rmsDiff(audio.getAllWindows()[0][iwin], 
+				output.getAllWindows()[0][iwin]);
+		System.out.println("rmsDiffWin: " + rmsDiffWin);
 		
 		//plot.getPlotPanel().addPoints(audio.getAllWindows()[0][iwin]);
 		//PointsView pv = plot.getPlotPanel().addPoints(output.getAllWindows()[0][iwin]);
@@ -135,11 +134,13 @@ public class FilterBankStepDemo {
 	}
 	
 	private static float rmsDiff(float[] arr1, float[] arr2){
-		if(arr1.length!=arr2.length)
-			throw new IllegalArgumentException("arr1.length!=arr2.length");
+		System.out.println(arr1.length + ", " + arr2.length);
+		if(arr1.length<arr2.length)
+			throw new IllegalArgumentException("arr1.length<arr2.length");
 		float rms = 0;
-		for(int i=0; i<arr1.length; i++)
+		for(int i=0; i<arr1.length; i++){
 			rms += (arr1[i] - arr2[i])*(arr1[i] - arr2[i]);
+		}
 		return (float)Math.sqrt(rms/arr1.length);
 	}
 	
