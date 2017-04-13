@@ -5,8 +5,8 @@ import audioCompression.types.AudioCompressionType;
 
 public class HuffmanEncoderStep implements AlgorithmStep<AudioByteBuffer, AudioByteBuffer>  {
 
-	private static final String NAME = "Huffman";
-	
+	private static final String NAME = "Huffman Encoder";
+
 	@Override
 	public AudioByteBuffer forward(AudioByteBuffer input, String name) {
 		// TODO Auto-generated method stub
