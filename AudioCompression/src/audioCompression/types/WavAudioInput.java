@@ -42,6 +42,12 @@ public class WavAudioInput implements RawAudio{
 	}
 	
 	@Override
+	public void writeFile(String filename) {
+		// todo - write out the wav file, this will probably not be used much in this class
+		//  but is here for completeness of the interface.
+	}
+	
+	@Override
 	public int getNChannels(){
 		return wavFile.getNumChannels();
 	}
