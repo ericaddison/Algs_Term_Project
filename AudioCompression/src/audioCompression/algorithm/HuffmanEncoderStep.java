@@ -10,13 +10,13 @@ public class HuffmanEncoderStep implements AlgorithmStep<AudioByteBuffer, AudioB
 	@Override
 	public AudioByteBuffer forward(AudioByteBuffer input, String name) {
 		// TODO Auto-generated method stub
-		return null;
+		return input;
 	}
 
 	@Override
 	public AudioByteBuffer reverse(AudioByteBuffer input, String name) {
 		// TODO Auto-generated method stub
-		return null;
+		return input;
 	}
 
 	@Override
