@@ -1,7 +1,12 @@
 package audioCompression.algorithm;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
-import java.util.Random;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
 
 import audioCompression.types.AudioByteBuffer;
 import audioCompression.types.AudioCompressionType;
@@ -28,31 +33,57 @@ public class SerializationStep implements AlgorithmStep<AudioByteBuffer, Compres
 	public CompressedAudioFile forward(AudioByteBuffer input, String name) {
 		// TODO Auto-generated method stub
 		
+		//long fileSize = 0;
 		
+		try {
+			File file = new File(name);
+			FileOutputStream strm = new FileOutputStream(file, false); 
+			FileChannel channel = strm.getChannel();
+			
+			// Writes a sequence of bytes to this channel from the given buffer.
+			channel.write(input.getBuffer());
+			// close the channel
+			channel.close();
+			strm.close();		
+		}
+		catch (IOException exc) {
+			System.out.println(exc);
+            System.exit(1);
+		}	
 		
-		
-		
-		CompressedAudioFile output = new CompressedAudioFile(name);
-		
-		return output;
+		return new CompressedAudioFile(name);
 	}
 
 	@Override
 	public AudioByteBuffer reverse(CompressedAudioFile input, String name) {
-		// TODO Auto-generated method stub
 		
-		String compName = input.GetCompressedFilename();
+		String compName = input.GetCompressedFilename();	
+		try {
+			// load the file and pull out the byte buffer stream... 
+			
+			RandomAccessFile aFile = new RandomAccessFile(compName, "r");	
+			FileChannel inChannel = aFile.getChannel();
+			
+			long fileSize = inChannel.size();			
+			ByteBuffer buffer = ByteBuffer.allocate((int)fileSize);
+			
+			// read in the data to the buffer
+			inChannel.read(buffer);
+			buffer.rewind();		
+			
+			AudioByteBuffer abuff = new AudioByteBuffer(buffer);
 		
-		// load the file and pull out the byte buffer stream... 		
-		
-		int n = 100;
-		AudioByteBuffer buffer = new AudioByteBuffer(ByteBuffer.allocate(n*(Integer.SIZE/Byte.SIZE)));
-		Random r = new Random(System.currentTimeMillis()); 
-		for(int i=0; i<n; i++)
-			buffer.getBuffer().putInt(r.nextInt());
-		
-		buffer.getBuffer().rewind();
-		return buffer;
+			inChannel.close();
+			aFile.close();
+			
+			return abuff;
+		}
+		catch(IOException exc)
+		{
+			System.out.println(exc);
+            System.exit(1);
+		}
+		return null;
 	}
 
 	@Override
