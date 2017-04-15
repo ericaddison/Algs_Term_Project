@@ -12,8 +12,8 @@ import audioCompression.types.RawAudio;
  */
 public interface AudioCompressor {
 
-	public CompressedAudioFile compress(RawAudio rawInput);
+	public CompressedAudioFile compress(RawAudio rawInput, String compressedName);
 	
-	public RawAudio decompress(CompressedAudioFile compressedInput);
+	public RawAudio decompress(CompressedAudioFile compressedInput, String decompressName);
 	
 }

@@ -4,16 +4,16 @@ import audioCompression.types.AudioByteBuffer;
 import audioCompression.types.AudioCompressionType;
 import audioCompression.types.CompressedAudioFile;
 
-public class CompressedAudioFileWriter implements AlgorithmStep<AudioByteBuffer, CompressedAudioFile> {
+public class SerializationStep implements AlgorithmStep<AudioByteBuffer, CompressedAudioFile> {
 
 	@Override
-	public CompressedAudioFile forward(AudioByteBuffer input) {
+	public CompressedAudioFile forward(AudioByteBuffer input, String name) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public AudioByteBuffer reverse(CompressedAudioFile input) {
+	public AudioByteBuffer reverse(CompressedAudioFile input, String name) {
 		// TODO Auto-generated method stub
 		return null;
 	}
