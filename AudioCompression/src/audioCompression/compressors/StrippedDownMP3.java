@@ -26,17 +26,17 @@ public class StrippedDownMP3 implements AudioCompressor{
 		pipeline.addStep(new MdctStep());
 		pipeline.addStep(new ByteBufferizerStep());
 		pipeline.addStep(new HuffmanEncoderStep());
-		pipeline.addStep(new CompressedAudioFileWriter());
+		pipeline.addStep(new SerializationStep());
 	}
 	
 	@Override
-	public CompressedAudioFile compress(RawAudio rawInput){
-		return (CompressedAudioFile) pipeline.processForward(rawInput);
+	public CompressedAudioFile compress(RawAudio rawInput, String compressedName){
+		return (CompressedAudioFile) pipeline.processForward(rawInput, compressedName);
 	}
 	
 	@Override
-	public RawAudio decompress(CompressedAudioFile compressedInput){
-		return (RawAudio) pipeline.processReverse(compressedInput);
+	public RawAudio decompress(CompressedAudioFile compressedInput, String decompressName){
+		return (RawAudio) pipeline.processReverse(compressedInput, decompressName);
 	}
 	
 }

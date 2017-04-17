@@ -7,13 +7,13 @@ import audioCompression.types.Lines;
 public class ByteBufferizerStep implements AlgorithmStep<Lines, AudioByteBuffer>{
 
 	@Override
-	public AudioByteBuffer forward(Lines input) {
+	public AudioByteBuffer forward(Lines input, String name) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Lines reverse(AudioByteBuffer input) {
+	public Lines reverse(AudioByteBuffer input, String name) {
 		// TODO Auto-generated method stub
 		return null;
 	}
