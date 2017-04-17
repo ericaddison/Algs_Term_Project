@@ -56,11 +56,6 @@ public class RawAudioImpl implements RawAudio{
 	}
 	
 	@Override
-	public void writeFile(String filename) {
-		// todo - write out the wav file
-	}
-	
-	@Override
 	public long getSampleRate() {
 		return 1;
 	}

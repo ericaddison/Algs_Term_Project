@@ -29,11 +29,6 @@ public class WavAudioOutput implements RawAudio{
 	}
 	
 	@Override
-	public void writeFile(String filename) {
-		// todo - write out the wav file
-	}
-	
-	@Override
 	public int getNChannels(){
 		return nChannels;
 	}

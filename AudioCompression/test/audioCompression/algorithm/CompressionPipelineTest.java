@@ -42,7 +42,7 @@ public class CompressionPipelineTest {
 		CompressionPipeline pipeline = new CompressionPipeline();
 		pipeline.addStep(new TestAlgStep1());
 		AudioCompressionType input = new TestAudioType1();
-		AudioCompressionType output = pipeline.processForward(input, "test1");
+		AudioCompressionType output = pipeline.processForward(input);
 		assertTrue(output instanceof TestAudioType2);
 		assertEquals(PROCESSED_S, ((TestAudioType2)output).value);
 	}
@@ -53,7 +53,7 @@ public class CompressionPipelineTest {
 		pipeline.addStep(new TestAlgStep1());
 		pipeline.addStep(new TestAlgStep2());
 		AudioCompressionType input = new TestAudioType1();
-		AudioCompressionType output = pipeline.processForward(input, "test2");
+		AudioCompressionType output = pipeline.processForward(input);
 		assertTrue(output instanceof TestAudioType3);
 		assertEquals(PROCESSED_D, ((TestAudioType3)output).value, 0.001);
 	}
@@ -63,7 +63,7 @@ public class CompressionPipelineTest {
 		CompressionPipeline pipeline = new CompressionPipeline();
 		pipeline.addStep(new TestAlgStep1());
 		AudioCompressionType input = new TestAudioType2();
-		AudioCompressionType output = pipeline.processReverse(input, "test3");
+		AudioCompressionType output = pipeline.processReverse(input);
 		assertTrue(output instanceof TestAudioType1);
 		assertEquals(PROCESSED_I, ((TestAudioType1)output).value);
 	}
@@ -74,7 +74,7 @@ public class CompressionPipelineTest {
 		pipeline.addStep(new TestAlgStep1());
 		pipeline.addStep(new TestAlgStep2());
 		AudioCompressionType input = new TestAudioType3();
-		AudioCompressionType output = pipeline.processReverse(input, "test4");
+		AudioCompressionType output = pipeline.processReverse(input);
 		assertTrue(output instanceof TestAudioType1);
 		assertEquals(PROCESSED_I, ((TestAudioType1)output).value);
 	}
@@ -87,14 +87,14 @@ public class CompressionPipelineTest {
 	private class TestAlgStep1 implements AlgorithmStep<TestAudioType1, TestAudioType2>{
 
 		@Override
-		public TestAudioType2 forward(TestAudioType1 input, String name) {
+		public TestAudioType2 forward(TestAudioType1 input) {
 			TestAudioType2 output = new TestAudioType2();
 			output.value = PROCESSED_S;
 			return output;
 		}
 
 		@Override
-		public TestAudioType1 reverse(TestAudioType2 input, String name) {
+		public TestAudioType1 reverse(TestAudioType2 input) {
 			TestAudioType1 output = new TestAudioType1();
 			output.value = PROCESSED_I;
 			return output;
@@ -120,14 +120,14 @@ public class CompressionPipelineTest {
 	private class TestAlgStep2 implements AlgorithmStep<TestAudioType2, TestAudioType3>{
 
 		@Override
-		public TestAudioType3 forward(TestAudioType2 input, String name) {
+		public TestAudioType3 forward(TestAudioType2 input) {
 			TestAudioType3 output = new TestAudioType3();
 			output.value = PROCESSED_D;
 			return output;
 		}
 
 		@Override
-		public TestAudioType2 reverse(TestAudioType3 input, String name) {
+		public TestAudioType2 reverse(TestAudioType3 input) {
 			TestAudioType2 output = new TestAudioType2();
 			output.value = PROCESSED_S;
 			return output;

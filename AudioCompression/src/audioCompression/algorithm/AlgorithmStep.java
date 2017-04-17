@@ -22,24 +22,18 @@ public interface AlgorithmStep<InputType extends AudioCompressionType,
 	 * 
 	 * @param input
 	 *            the input data for the forward operation
-	 * @param name
-	 *      	  the name of the file to be written, this gets passed through 
-	 *      	  each stage mostly for writing out to disk
 	 * @return the forward processed data
 	 */
-	public OutputType forward(InputType input, String name);
+	public OutputType forward(InputType input);
 
 	/**
 	 * Perform the reverse (decompression) operation for this algorithm step.
 	 * 
 	 * @param input
 	 *            the input data for the reverse operation
-	 * @param name
-	 *      	  the name of the file to be written, this gets passed through 
-	 *      	  each stage mostly for writing out to disk 	
 	 * @return the reverse processed data
 	 */
-	public InputType reverse(OutputType input, String name);
+	public InputType reverse(OutputType input);
 
 	/**
 	 * Get the name of this step

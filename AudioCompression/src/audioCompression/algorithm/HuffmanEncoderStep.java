@@ -5,23 +5,21 @@ import audioCompression.types.AudioCompressionType;
 
 public class HuffmanEncoderStep implements AlgorithmStep<AudioByteBuffer, AudioByteBuffer>  {
 
-	private static final String NAME = "Huffman";
-	
 	@Override
-	public AudioByteBuffer forward(AudioByteBuffer input, String name) {
+	public AudioByteBuffer forward(AudioByteBuffer input) {
 		// TODO Auto-generated method stub
-		return input;
+		return null;
 	}
 
 	@Override
-	public AudioByteBuffer reverse(AudioByteBuffer input, String name) {
+	public AudioByteBuffer reverse(AudioByteBuffer input) {
 		// TODO Auto-generated method stub
-		return input;
+		return null;
 	}
 
 	@Override
 	public String getName() {
-		return NAME;
+		return null;
 	}
 
 	@Override

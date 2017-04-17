@@ -37,8 +37,8 @@ public class FilterBankStepDemo {
 		FilterBankStep fb = new FilterBankStep(nbands, new HannWindow(fN));
 		//FilterBankStep fb = new FilterBankStep(nbands, new KaiserWindow(fN,0.05f));
 		
-		Subbands sub = fb.forward(audio, "subBandsForw");
-		WavAudioOutput output = (WavAudioOutput)fb.reverse(sub, "subBandsRev");
+		Subbands sub = fb.forward(audio);
+		WavAudioOutput output = (WavAudioOutput)fb.reverse(sub);
 		
 		System.out.println(sub.getAllWindows().length);
 		System.out.println(sub.getAllWindows()[0].length);

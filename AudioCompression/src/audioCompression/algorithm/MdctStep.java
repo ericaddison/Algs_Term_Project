@@ -9,13 +9,13 @@ public class MdctStep implements AlgorithmStep<Subbands, Lines> {
 	private static final String NAME = "MDCT";
 	
 	@Override
-	public Lines forward(Subbands input, String name) {
+	public Lines forward(Subbands input) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Subbands reverse(Lines input, String name) {
+	public Subbands reverse(Lines input) {
 		// TODO Auto-generated method stub
 		return null;
 	}

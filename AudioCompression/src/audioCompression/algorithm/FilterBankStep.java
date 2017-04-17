@@ -30,7 +30,7 @@ public class FilterBankStep implements AlgorithmStep<RawAudio, Subbands> {
 	
 	
 	@Override
-	public Subbands forward(RawAudio input, String name) {
+	public Subbands forward(RawAudio input) {
 		Iterator<float[][]> iter = input.getWindowIterator();
 		int windowCount = 0;
 		Subbands subbands = new Subbands(input, nBands);
@@ -57,7 +57,7 @@ public class FilterBankStep implements AlgorithmStep<RawAudio, Subbands> {
 	}
 
 	@Override
-	public RawAudio reverse(Subbands input, String name) {
+	public RawAudio reverse(Subbands input) {
 		Iterator<float[][][]> iter = input.getWindowIterator();
 		int windowCount = 0;
 		
@@ -82,8 +82,6 @@ public class FilterBankStep implements AlgorithmStep<RawAudio, Subbands> {
 		}
 		WavAudioOutput out = 
 				new WavAudioOutput(windows, input.getWindowOverlap(), input.getSampleRate());
-		
-		out.writeFile(name);
 		return out;
 	}
 

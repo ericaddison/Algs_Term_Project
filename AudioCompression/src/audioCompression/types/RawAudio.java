@@ -16,8 +16,6 @@ public interface RawAudio extends AudioCompressionType {
 	
 	public int getNChannels();
 	
-	public void writeFile(String filename);
-	
 	/**
 	 * Get the next N samples from the raw audio buffer
 	 * @param nsamples the number of audio samples to get
