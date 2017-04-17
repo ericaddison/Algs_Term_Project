@@ -11,7 +11,7 @@ public class SubbandsByteBufferizerStep implements AlgorithmStep<Subbands, Audio
 
 
 	@Override
-	public AudioByteBuffer forward(Subbands input) {
+	public AudioByteBuffer forward(Subbands input, String fileName) {
 		int sampleRate = input.getSampleRate();
 		int nWindows = input.getNWindows();
 		int samplesPerWindow = input.getSamplesPerWindow();
@@ -52,7 +52,7 @@ public class SubbandsByteBufferizerStep implements AlgorithmStep<Subbands, Audio
 
 	
 	@Override
-	public Subbands reverse(AudioByteBuffer input) {
+	public Subbands reverse(AudioByteBuffer input, String fileName) {
 		input.getBuffer().rewind();
 		int sampleRate = input.getBuffer().getInt();
 		int nWindows = input.getBuffer().getInt();

@@ -53,28 +53,27 @@ public class FilterBankStepDemo {
 		//FilterBankStep fb = new FilterBankStep(nbands, new KaiserWindow(fN,0.05f));
 		SubbandsByteBufferizerStep sbb = new SubbandsByteBufferizerStep();
 		
+		String fileName = "testName";
+		
 		long t1 = System.currentTimeMillis();
-		Subbands sub = fb.forward(audio);
+		Subbands sub = fb.forward(audio, fileName);
 		long t2 = System.currentTimeMillis();
 		System.out.println("filterbank forward time: " + (t2-t1) + "ms");
 		
 		t1 = System.currentTimeMillis();
-		AudioByteBuffer abb = sbb.forward(sub);
+		AudioByteBuffer abb = sbb.forward(sub, fileName);
 		t2 = System.currentTimeMillis();
 		System.out.println("bufferizer forward time: " + (t2-t1) + "ms");
 		
 		t1 = System.currentTimeMillis();
-		Subbands sub2 = sbb.reverse(abb);
+		Subbands sub2 = sbb.reverse(abb, fileName);
 		t2 = System.currentTimeMillis();
 		System.out.println("bufferizer reverse time: " + (t2-t1) + "ms");
 		
 		t1 = System.currentTimeMillis();
-		WavAudioOutput output = (WavAudioOutput)fb.reverse(sub2);
+		WavAudioOutput output = (WavAudioOutput)fb.reverse(sub, fileName);
 		t2 = System.currentTimeMillis();
 		System.out.println("filterbank reverse: " + (t2-t1) + "ms");
-		
-		Subbands sub = fb.forward(audio, "subBandsForw");
-		WavAudioOutput output = (WavAudioOutput)fb.reverse(sub, "subBandsRev");
 		
 		System.out.println(sub.getAllWindows().length);
 		System.out.println(sub.getAllWindows()[0].length);

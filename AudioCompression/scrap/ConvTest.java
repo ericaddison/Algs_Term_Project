@@ -27,7 +27,7 @@ public class ConvTest {
 		Conv.conv(x1.length, 0, x1, x2.length, 0, x2, x1.length, (x1.length-x2.length-1)/2, x3);
 		System.out.println(Arrays.toString(x3));
 		
-		RawAudioImpl aud = new RawAudioImpl(500, 500, 0);
+		RawAudioImpl aud = new RawAudioImpl(500, 500, 0, 1);
 		Filter f = FilterFactory.makeLowpassFilter(0.1f, new HannWindow(500));
 		float[] filtered = f.applyTimeDomain(aud.getAudioBuffer(500)[0]);
 		

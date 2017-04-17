@@ -29,7 +29,7 @@ public class FilterBankStep implements AlgorithmStep<RawAudio, Subbands> {
 	
 	
 	@Override
-	public Subbands forward(RawAudio input) {
+	public Subbands forward(RawAudio input, String fileName) {
 		if(input.getNChannels()>1)
 			throw new IllegalArgumentException("Error! Implementation not functional for >1 audio channels!");
 		
@@ -63,7 +63,7 @@ public class FilterBankStep implements AlgorithmStep<RawAudio, Subbands> {
 	}
 
 	@Override
-	public RawAudio reverse(Subbands input) {
+	public RawAudio reverse(Subbands input, String fileName) {
 		if(input.getNChannels()>1)
 			throw new IllegalArgumentException("Error! Implementation not functional for >1 audio channels!");
 		

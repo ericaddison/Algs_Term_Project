@@ -8,7 +8,7 @@ public class RawAudioImplDemo {
 
 	public static void main(String[] args){
 		
-		RawAudioImpl audio = new RawAudioImpl(1000, 100, 20);
+		RawAudioImpl audio = new RawAudioImpl(1000, 100, 20, 2);
 		
 		PlotFrame f1 = new PlotFrame(new PlotPanel(2, 1));
 		f1.getPlotPanel().addPoints(0,0,audio.getAudioBuffer(1000)[0]);

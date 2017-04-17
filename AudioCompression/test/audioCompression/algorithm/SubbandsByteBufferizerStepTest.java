@@ -35,9 +35,9 @@ public class SubbandsByteBufferizerStepTest {
 		
 		SubbandsByteBufferizerStep sbb = new SubbandsByteBufferizerStep();
 		
-		AudioByteBuffer abb = sbb.forward(sub);
+		AudioByteBuffer abb = sbb.forward(sub, "testName");
 		
-		Subbands sub2 = sbb.reverse(abb);
+		Subbands sub2 = sbb.reverse(abb, "testName");
 
 		assertEquals(windows[0][0][0][0], sub2.getAllWindows()[0][0][0][0], 0.01f);
 		assertEquals(sub.getNBands(), sub2.getNBands());
