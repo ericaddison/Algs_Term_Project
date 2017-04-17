@@ -12,14 +12,13 @@ public class Subbands implements AudioCompressionType {
 	int nChannels;
 	int nBands;
 	int byteDepth;
-	float[][][][] windows;
+	protected float[][][][] windows;
 	
 	public Subbands(RawAudio audio, int nBands) {
 		sampleRate = (int)audio.getSampleRate();
 		nWindows = audio.getNWindows();
 		samplesPerWindow = (int)(audio.getSamplesPerWindow()/nBands);
-		//samplesPerWindow = (int)(audio.getSamplesPerWindow());
-		windowOverlap = audio.getWindowOverlap();
+		windowOverlap = audio.getWindowOverlap()/nBands;
 		nChannels = audio.getNChannels();
 		this.nBands = nBands;
 		this.byteDepth = audio.getByteDepth();
