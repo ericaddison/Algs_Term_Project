@@ -14,11 +14,16 @@ public class FileCompressDemo {
 		StrippedDownMP3 pipeline = new StrippedDownMP3();
 		
 		/// This doesn't appear to work.  The StrippedDownMP3 expects RawAudio not WavAudio
-		WavAudio wav = new WavAudio(file, 48000/32, 0.0f);
+		WavAudioInput wav = new WavAudioInput(file, 48000/32, 0);
 		long startTime = System.nanoTime();
-		CompressedAudio out = pipeline.compress(wav);
+		CompressedAudioFile out = pipeline.compress(wav, "name_compressed.jet");
+		
+		System.out.println("Output string should be [ name_compressed.jet ] and actually was [ " + out.GetCompressedFilename() + " ]");
+		
+		
 		long midTime = System.nanoTime();
-		RawAudio wavOut = pipeline.decompress(out);
+		RawAudio wavOut = pipeline.decompress(out, "name_decompressed.wav");
+	
 		long endTime = System.nanoTime();
 		
 		long compressTime = midTime - startTime;
