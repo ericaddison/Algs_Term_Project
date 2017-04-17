@@ -7,7 +7,6 @@ import org.junit.runner.RunWith;
 @Suite.SuiteClasses({
 	BitstreamFormatterStepTest.class,
 	CompressionPipelineTest.class,
-	FilterBankStepTest.class,
 	HuffmanEncoderStepTest.class,
 	MdctStepTest.class
 	})

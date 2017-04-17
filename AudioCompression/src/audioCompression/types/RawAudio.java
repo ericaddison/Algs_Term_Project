@@ -38,5 +38,7 @@ public interface RawAudio extends AudioCompressionType {
 	 * @return
 	 */
 	public Iterator<float[][]> getWindowIterator();
+
+	public int getByteDepth();
 	
 }

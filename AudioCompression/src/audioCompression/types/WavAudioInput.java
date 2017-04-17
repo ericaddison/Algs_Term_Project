@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 
+import audioCompression.algorithm.dsp.window.KbdWindow;
+import audioCompression.algorithm.dsp.window.Window;
+
 import libs.wavParser.WavFile;
 import libs.wavParser.WavFileException;
 
@@ -15,6 +18,7 @@ public class WavAudioInput implements RawAudio{
 	private int nWindows;             // total number of windows (including the overlap)
 	private int samplesPerWindow;      // number of samples per window
 	private int windowOverlap;       // percentage of window overlap
+	private int byteDepth;
 	private File inputFile;
 	
 	public WavAudioInput(File inputFile, int samplesPerWindow, int windowOverlap) {
@@ -22,6 +26,7 @@ public class WavAudioInput implements RawAudio{
 			this.inputFile = inputFile;
 			this.wavFile = WavFile.openWavFile(inputFile);
 			nSamples = wavFile.getNumFrames();
+			this.byteDepth = (wavFile.getValidBits()+7)/8;
 			
 			this.samplesPerWindow = samplesPerWindow;
 			
@@ -83,7 +88,6 @@ public class WavAudioInput implements RawAudio{
 	}	
 	
 	@Override
-	// only returns the first audio channel...
 	public float[][] getAudioBuffer(int samp2) {
 		try {
 			wavFile = WavFile.openWavFile(inputFile);
@@ -129,7 +133,7 @@ public class WavAudioInput implements RawAudio{
 				windowBuffer = new float[myWavFile.getNumChannels()][(int)samplesPerWindow];
 				windowIncrement = samplesPerWindow-windowOverlap;
 				// pre-populate window
-				myWavFile.readFrames(windowBuffer, windowOverlap, windowIncrement);
+				myWavFile.readFrames(windowBuffer, 0, windowOverlap);
 			} catch (IOException | WavFileException e) {
 				e.printStackTrace();
 			}
@@ -148,8 +152,9 @@ public class WavAudioInput implements RawAudio{
 				// read new frames
 				myWavFile.readFrames(windowBuffer, windowOverlap, windowIncrement);
 				float[][] windowCopy = new float[getNChannels()][];
-				for(int i=0; i<windowCopy.length; i++)
+				for(int i=0; i<windowCopy.length; i++){
 					windowCopy[i] = Arrays.copyOf(windowBuffer[i],windowBuffer[i].length);
+				}
 				return windowCopy;
 			} catch (IOException | WavFileException e) {
 				e.printStackTrace();
@@ -159,10 +164,15 @@ public class WavAudioInput implements RawAudio{
 		
 		private void shiftWindow(){
 			for(int i=0; i<myWavFile.getNumChannels(); i++)
-				for(int j=0; j<windowIncrement; j++)
-					windowBuffer[i][j] = windowBuffer[i][(j+windowOverlap)];
+				for(int j=0; j<windowOverlap; j++)
+					windowBuffer[i][j] = windowBuffer[i][(j+windowIncrement)];
 		}
 		
+	}
+
+	@Override
+	public int getByteDepth() {
+		return byteDepth;
 	}
 
 }

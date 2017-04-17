@@ -1,12 +1,9 @@
 package audioCompression.types;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 
 import libs.wavParser.WavFile;
-import libs.wavParser.WavFileException;
 
 public class WavAudioOutput implements RawAudio{
 
@@ -17,15 +14,17 @@ public class WavAudioOutput implements RawAudio{
 	private int samplesPerWindow;      // number of samples per window
 	private int windowOverlap;       // percentage of window overlap
 	private int sampleRate;
+	private int byteDepth;
 	private float[][][] windows;
 	
-	public WavAudioOutput(float[][][] windows, int windowOverlap, int sampleRate) {
+	public WavAudioOutput(float[][][] windows, int windowOverlap, int sampleRate, int byteDepth) {
 		this.nWindows = windows[0].length;
 		this.samplesPerWindow = windows[0][0].length;
 		this.windowOverlap = windowOverlap;
 		this.nChannels = windows.length;
 		this.sampleRate = sampleRate;
 		this.windows = windows;
+		this.byteDepth = byteDepth;
 	}
 	
 	@Override
@@ -70,7 +69,41 @@ public class WavAudioOutput implements RawAudio{
 	
 	@Override
 	public float[][] getAudioBuffer(int samp2) {
-		return null;
+		float[][] buffer = new float[nChannels][samp2];
+		WindowIterator iter = new WindowIterator();
+		
+		// prepopulate with first window
+		for(int ichan=0; ichan<nChannels; ichan++){
+			float[][] nextWin = iter.next();
+			for(int i=0; i<samplesPerWindow; i++)
+				buffer[ichan][i] = nextWin[ichan][i];
+		}
+
+		System.out.println("Overlap = " + windowOverlap);
+		
+		int sampsWritten = samplesPerWindow;
+		while(iter.hasNext() && sampsWritten<samp2){
+			float[][] nextWin = iter.next();
+			sampsWritten -= windowOverlap;
+			int nsamps = Math.min(samp2-sampsWritten, samplesPerWindow);
+
+			for(int ichan=0; ichan<nChannels; ichan++){
+			
+				// do overlap zone
+				for(int i=0; i<windowOverlap; i++){
+					buffer[ichan][i+sampsWritten] += nextWin[ichan][i];
+					buffer[ichan][i+sampsWritten] /= 2.0f;
+				}
+				
+				// no overlap zone
+				for(int i=windowOverlap; i<nsamps; i++){
+					buffer[ichan][i+sampsWritten] = nextWin[ichan][i];
+				}
+					
+			}
+			sampsWritten += nsamps;
+		}
+		return buffer;
 	}
 	
 	@Override
@@ -80,22 +113,30 @@ public class WavAudioOutput implements RawAudio{
 
 	private class WindowIterator implements Iterator<float[][]>{
 		
-		private float[][] windowBuffer;
-		private int windowIncrement;
+		private int windowCount=0;
 		
 		public WindowIterator() {
 		}
 		
 		@Override
 		public boolean hasNext() {
-			return false;
+			return windowCount<nWindows;
 		}
 
 		@Override
 		public float[][] next() {
-			return null;
+			float[][] nextWin = new float[nChannels][];
+			for(int i=0; i<nChannels; i++)
+				nextWin[i] = Arrays.copyOf(windows[i][windowCount], samplesPerWindow);
+			windowCount++;
+			return nextWin;
 		}
 		
 	}
 
+	@Override
+	public int getByteDepth() {
+		return byteDepth;
+	}
+	
 }

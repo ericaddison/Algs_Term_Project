@@ -10,8 +10,6 @@ public class CosineModulatedFilterBank {
 	private Filter prototypeFilter;
 	
 	public CosineModulatedFilterBank(int nBands, Window w) {
-		if(w.getLength()%nBands != 0)
-			w.setLength(w.getLength() + (nBands - w.getLength()%nBands));
 		this.prototypeFilter = FilterFactory.makeLowpassFilter(0.5f/(nBands), w);
 		System.out.println("Fiter length = " + w.getLength());
 		this.nBands = nBands;
@@ -63,6 +61,8 @@ public class CosineModulatedFilterBank {
 		for(int i=0; i<nBands; i++){
 			float[] filt = new float[in[i].length];
 			filt = decimatedFilters[i].applyTimeDomainReverse(in[i]);
+			
+			// upsample
 			for(int j=0; j<in[i].length; j++)
 				out[i+j*nBands] = filt[j];
 		}

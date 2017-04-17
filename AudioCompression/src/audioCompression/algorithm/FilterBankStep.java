@@ -1,6 +1,5 @@
 package audioCompression.algorithm;
 
-import java.sql.NClob;
 import java.util.Iterator;
 
 import audioCompression.algorithm.dsp.CosineModulatedFilterBank;
@@ -30,25 +29,32 @@ public class FilterBankStep implements AlgorithmStep<RawAudio, Subbands> {
 	
 	
 	@Override
-	public Subbands forward(RawAudio input, String name) {
+	public Subbands forward(RawAudio input, String fileName) {
+		if(input.getNChannels()>1)
+			throw new IllegalArgumentException("Error! Implementation not functional for >1 audio channels!");
+		
 		Iterator<float[][]> iter = input.getWindowIterator();
 		int windowCount = 0;
 		Subbands subbands = new Subbands(input, nBands);
 		if(filterBank==null)
 			filterBank = new CosineModulatedFilterBank(nBands, w);
 		
-		//Window inputWindow = new HannWindow((int)input.getSamplesPerWindow());
-		
 		while(iter.hasNext()){
+			
+			if(windowCount == input.getNWindows()){
+				System.out.println("oh no!");
+				break;
+			}
 			
 			float[][] nextWindow = iter.next();
 
 			for(int i=0; i<input.getNChannels(); i++){
-				//float[] windowedInput = inputWindow.apply(nextWindow[i]);
 				float[][] channelized = filterBank.analysisDecimated(nextWindow[i]);
 				//float[][] channelized = filterBank.analysis(nextWindow[i]);
+
 				for(int j=0; j<nBands; j++)
 					subbands.putWindow(i, j, windowCount, channelized[j]);
+				
 			}
 			windowCount++;
 		}
@@ -57,18 +63,17 @@ public class FilterBankStep implements AlgorithmStep<RawAudio, Subbands> {
 	}
 
 	@Override
-	public RawAudio reverse(Subbands input, String name) {
+	public RawAudio reverse(Subbands input, String fileName) {
+		if(input.getNChannels()>1)
+			throw new IllegalArgumentException("Error! Implementation not functional for >1 audio channels!");
+		
 		Iterator<float[][][]> iter = input.getWindowIterator();
 		int windowCount = 0;
 		
-		if(filterBank==null){
-			w.setLength(input.getSamplesPerWindow());
+		if(filterBank==null)
 			filterBank = new CosineModulatedFilterBank(nBands, w);
-		}
 		
-		float[][][] windows = new float[input.getNChannels()][][];
-		for(int i=0; i<input.getNChannels(); i++)
-			windows[i] = new float[input.getNWindows()][];
+		float[][][] windows = new float[input.getNChannels()][input.getNWindows()][input.getSamplesPerWindow()];
 		
 		while(iter.hasNext()){
 			
@@ -77,13 +82,13 @@ public class FilterBankStep implements AlgorithmStep<RawAudio, Subbands> {
 			for(int i=0; i<input.getNChannels(); i++){
 				//windows[i][windowCount] = filterBank.synthesis(nextWindow[i]);
 				windows[i][windowCount] = filterBank.synthesisDecimated(nextWindow[i]);
-			}
+			} 
 			
+			windowCount++;
 		}
 		WavAudioOutput out = 
-				new WavAudioOutput(windows, input.getWindowOverlap(), input.getSampleRate());
-		
-		out.writeFile(name);
+				new WavAudioOutput(windows, input.getWindowOverlap(), 
+						input.getSampleRate(), input.getByteDepth());
 		return out;
 	}
 

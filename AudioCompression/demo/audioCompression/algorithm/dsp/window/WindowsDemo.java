@@ -32,7 +32,7 @@ public class WindowsDemo {
 		windows.add(new HannWindow(N));
 		windows.add(new BlackmannWindow(N));
 		windows.add(new KaiserWindow(N, 5.0f/N));
-		windows.add(new KbdWindow(N, 50.0f/N));
+		windows.add(new KbdWindow(N, 0.4f));
 		
 		PlotFrame f1 = new PlotFrame(new PlotPanel(1,1));
 		List<float[]> data = new ArrayList<>();
