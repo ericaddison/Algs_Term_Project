@@ -75,6 +75,9 @@ public class FilterBankStepDemo {
 		t2 = System.currentTimeMillis();
 		System.out.println("filterbank reverse: " + (t2-t1) + "ms");
 		
+		// write the file
+		output.writeFile("../output_wavs/" + FilterBankStepDemo.class.getSimpleName() + ".wav");
+		
 		System.out.println(sub.getAllWindows().length);
 		System.out.println(sub.getAllWindows()[0].length);
 		System.out.println(sub.getAllWindows()[0][0].length);
