@@ -1,9 +1,12 @@
 package audioCompression.types;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 
 import libs.wavParser.WavFile;
+import libs.wavParser.WavFileException;
 
 public class WavAudioOutput implements RawAudio{
 
@@ -29,7 +32,20 @@ public class WavAudioOutput implements RawAudio{
 	
 	@Override
 	public void writeFile(String filename) {
-		// todo - write out the wav file
+		try {
+			wavFile = WavFile.newWavFile(new File(filename), nChannels, nWindows*samplesPerWindow, 8*byteDepth, sampleRate);
+			Iterator<float[][]> iter = getWindowIterator();
+			while(iter.hasNext()){
+				float[][] nextWindow = iter.next();
+				wavFile.writeFrames(nextWindow, samplesPerWindow);
+			}
+			wavFile.close();
+		} catch (IOException | WavFileException e) {
+			e.printStackTrace();
+		} 
+		
+		
+
 	}
 	
 	@Override
