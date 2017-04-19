@@ -5,9 +5,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import audioCompression.algorithm.dsp.window.KbdWindow;
-import audioCompression.algorithm.dsp.window.Window;
-
 import libs.wavParser.WavFile;
 import libs.wavParser.WavFileException;
 

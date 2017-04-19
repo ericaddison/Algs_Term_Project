@@ -2,8 +2,6 @@ package audioCompression.algorithm;
 
 import java.awt.Color;
 import java.io.File;
-import java.util.Arrays;
-import java.util.Iterator;
 
 import audioCompression.algorithm.dsp.window.HannWindow;
 import audioCompression.types.AudioByteBuffer;
@@ -36,6 +34,8 @@ public class MdctStepDemo {
 		WavAudioInput audio = new WavAudioInput(new File(filename), winSize, winOverlap);
 		FilterBankStep fb = new FilterBankStep(nbands, new HannWindow(fN));
 		MdctStep mdct = new MdctStep();
+		//LinesByteBufferizerStep lbb = new LinesByteBufferizerStep();
+		LinesByteBufferizerStep lbb = new AdaptiveLinesByteBufferizerStep();
 		
 		String fileName = "testName";
 		
@@ -50,7 +50,19 @@ public class MdctStepDemo {
 		System.out.println("mdct forward time: " + (t2-t1) + "ms");
 		
 		t1 = System.currentTimeMillis();
-		Subbands sub2 = mdct.reverse(lines, fileName);
+		AudioByteBuffer abb = lbb.forward(lines, fileName);
+		t2 = System.currentTimeMillis();
+		System.out.println("bufferizer forward time: " + (t2-t1) + "ms");
+		
+		t1 = System.currentTimeMillis();
+		Lines lines2 = lbb.reverse(abb, fileName);
+		t2 = System.currentTimeMillis();
+		System.out.println("bufferizer reverse time: " + (t2-t1) + "ms");
+		
+		
+		
+		t1 = System.currentTimeMillis();
+		Subbands sub2 = mdct.reverse(lines2, fileName);
 		t2 = System.currentTimeMillis();
 		System.out.println("mdct reverse time: " + (t2-t1) + "ms");
 		
@@ -67,13 +79,9 @@ public class MdctStepDemo {
 		System.out.println(sub.getAllWindows()[0][0].length);
 		System.out.println(sub.getAllWindows()[0][0][0].length);
 	
-		float[][][][] allWindows = sub2.getAllWindows();
 
 		PlotFrame plot = new PlotFrame(new PlotPanel(1,1));
 
-		Iterator<float[][]> iter = audio.getWindowIterator();
-		float[][] firstWin = iter.next();
-		
 		float[] firstHalf = output.getAudioBuffer((int)audio.getNSamples()/2)[0];
 		plot.getPlotPanel().addPoints(audio.getAudioBuffer((int)audio.getNSamples())[0]);
 		PointsView pv = plot.getPlotPanel().addPoints(firstHalf);
