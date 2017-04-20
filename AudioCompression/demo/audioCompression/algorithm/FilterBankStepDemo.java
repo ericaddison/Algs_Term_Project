@@ -12,6 +12,7 @@ import audioCompression.algorithm.dsp.window.HammingWindow;
 import audioCompression.algorithm.dsp.window.HannWindow;
 import audioCompression.algorithm.dsp.window.KaiserWindow;
 import audioCompression.algorithm.dsp.window.RectangleWindow;
+import audioCompression.algorithm.dsp.window.Window;
 import audioCompression.types.AudioByteBuffer;
 import audioCompression.types.Subbands;
 import audioCompression.types.WavAudioInput;
@@ -31,27 +32,21 @@ public class FilterBankStepDemo {
 		Color.YELLOW};
 	
 	public static void main(String[] args){
-		
-		int nbands = 16;
-		int fN = 2*512;
+		// adjustable parameters
+		int nbands = 16;				// number of subbands 2, 4, 8, 16, 32, 64
+		int fN = 2*512;					// length of the filter-bank filter, 128, 256, 512, 1024, 2048, 4096
+		int winSize = 50*nbands;		// size of signal window
+		Window w = new HannWindow(fN);	// window used to construct filter
 		
 		// I think there might be some offset problem with too many bands (or channels)!!!
 		
 		// apply to audio test
-		//RawAudioImpl audio = new RawAudioImpl(1000, 40*nbands, 00, 1);
 		String filename = "../src_wavs/nokia_tune.wav";
-		int nsamps = 48000/32;
-		
-		int winSize = 50*nbands;
-		int winOverlap = 0;
 		
 		if(winSize%nbands>0)
 			System.out.println("WARNING! winsize and overlap incompatible!");
-		WavAudioInput audio = new WavAudioInput(new File(filename), winSize, winOverlap);
-		FilterBankStep fb = new FilterBankStep(nbands, new HannWindow(fN));
-		//FilterBankStep fb = new FilterBankStep(nbands, new HannWindow(fN));
-		//FilterBankStep fb = new FilterBankStep(nbands, new KaiserWindow(fN,0.05f));
-		//SubbandsByteBufferizerStep sbb = new SubbandsByteBufferizerStep();
+		WavAudioInput audio = new WavAudioInput(new File(filename), winSize, 0);
+		FilterBankStep fb = new FilterBankStep(nbands, w);
 		SubbandsByteBufferizerStep sbb = new AdaptiveSubbandsByteBufferizerStep();
 		
 		String fileName = "testName";

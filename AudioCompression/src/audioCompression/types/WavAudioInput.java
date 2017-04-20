@@ -31,7 +31,7 @@ public class WavAudioInput implements RawAudio{
 			if(windowOverlap>samplesPerWindow/2 || windowOverlap<0)
 				throw new IllegalArgumentException("WavAudio: require 0<=windowOverlap<=sampsPerWindow/2");			
 			// set up window information, using wav frame-based values as intermediate information
-			this.nWindows = (int)((wavFile.getNumFrames()-samplesPerWindow)/(samplesPerWindow-windowOverlap) + 1);
+			this.nWindows = (int)((wavFile.getNumFrames()-samplesPerWindow)/(samplesPerWindow-windowOverlap) + 2);
 		} catch (IOException | WavFileException e) {
 			e.printStackTrace();
 		} finally{

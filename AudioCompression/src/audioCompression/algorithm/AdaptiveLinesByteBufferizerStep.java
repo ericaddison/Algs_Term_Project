@@ -98,7 +98,7 @@ public class AdaptiveLinesByteBufferizerStep extends LinesByteBufferizerStep imp
 
 	@Override
 	public Class<? extends AudioCompressionType> getInputClass() {
-		return Subbands.class;
+		return Lines.class;
 	}
 
 	@Override

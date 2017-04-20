@@ -89,7 +89,7 @@ public class LinesByteBufferizerStep implements AlgorithmStep<Lines, AudioByteBu
 
 	@Override
 	public Class<? extends AudioCompressionType> getInputClass() {
-		return Subbands.class;
+		return Lines.class;
 	}
 
 	@Override
