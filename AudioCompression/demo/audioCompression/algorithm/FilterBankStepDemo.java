@@ -51,7 +51,8 @@ public class FilterBankStepDemo {
 		FilterBankStep fb = new FilterBankStep(nbands, new HannWindow(fN));
 		//FilterBankStep fb = new FilterBankStep(nbands, new HannWindow(fN));
 		//FilterBankStep fb = new FilterBankStep(nbands, new KaiserWindow(fN,0.05f));
-		SubbandsByteBufferizerStep sbb = new SubbandsByteBufferizerStep();
+		//SubbandsByteBufferizerStep sbb = new SubbandsByteBufferizerStep();
+		SubbandsByteBufferizerStep sbb = new AdaptiveSubbandsByteBufferizerStep();
 		
 		String fileName = "testName";
 		
@@ -71,7 +72,7 @@ public class FilterBankStepDemo {
 		System.out.println("bufferizer reverse time: " + (t2-t1) + "ms");
 		
 		t1 = System.currentTimeMillis();
-		WavAudioOutput output = (WavAudioOutput)fb.reverse(sub, fileName);
+		WavAudioOutput output = (WavAudioOutput)fb.reverse(sub2, fileName);
 		t2 = System.currentTimeMillis();
 		System.out.println("filterbank reverse: " + (t2-t1) + "ms");
 		

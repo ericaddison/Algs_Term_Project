@@ -87,7 +87,7 @@ public class FilterBankStep implements AlgorithmStep<RawAudio, Subbands> {
 			windowCount++;
 		}
 		WavAudioOutput out = 
-				new WavAudioOutput(windows, input.getWindowOverlap(), 
+				new WavAudioOutput(windows, input.getWindowOverlap()*nBands, 
 						input.getSampleRate(), input.getByteDepth());
 		return out;
 	}
