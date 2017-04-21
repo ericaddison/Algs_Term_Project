@@ -34,6 +34,30 @@ public class CompressionPipeline {
 					+ " to add step with Input/Output type mismatch");
 	}
 	
+	public void addStep(AlgorithmStep step, int index)
+	{
+		pipeline.add(index, step);
+	}
+	
+	public void removeStep(AlgorithmStep step)
+	{
+		pipeline.remove(step);
+	}
+	
+	public void removeStep(int index)
+	{
+		pipeline.remove(index);
+	}
+	
+	public AlgorithmStep getStep(int index)
+	{
+		if ((index < 0) || (index >= pipeline.size())) {
+			throw new IllegalArgumentException("Invalid step index given!");
+		}
+		return pipeline.get(index);
+	
+	}
+	
 	
 	/**
 	 * Process an input dataset through the pipeline in the 
@@ -91,11 +115,30 @@ public class CompressionPipeline {
 		return pipeline.size();
 	}
 	
+	public boolean isPipelineValid()
+	{
+		// go through all steps and check for the correct output to input between each step
+		Iterator<AlgorithmStep> iter = pipeline.iterator();
+		AlgorithmStep prevStep = pipeline.getFirst();
+		iter.next();
+		while(iter.hasNext()) {
+			AlgorithmStep nextStep = iter.next(); 
+			
+			if (prevStep.getOutputClass() != nextStep.getInputClass()) {
+				return false;
+			}
+			prevStep = nextStep;
+		}	
+		
+		return true;
+	}
 	
 	// Ensure a new step is valid to add to the end of the pipeline
 	private boolean checkStep(AlgorithmStep newStep){
 		return pipeline.size()==0 
 			|| pipeline.getLast().getOutputClass()==newStep.getInputClass();
 	}
+	
+	
 	
 }
