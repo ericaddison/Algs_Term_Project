@@ -104,4 +104,22 @@ public class FullAudioCompressor implements AudioCompressor {
 		
 	}
 	
+	/// Method for enabling / disabling the Adaptive Byte Buffer vs Regular Byte Buffer
+	public void EnableAdaptiveByteBufferizer(boolean enable)
+	{
+		// if the adaptive byte bufferizer is already set properly, do nothing
+		if (m_bAdaptiveByteBuffEnabled == enable) { return; }
+		
+		m_bAdaptiveByteBuffEnabled = enable;
+		if (enable) {
+			// switch out regular for the adaptive
+			
+			
+		} else {
+			
+			
+		}		
+		
+	}
+	
 }
