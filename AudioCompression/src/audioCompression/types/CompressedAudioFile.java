@@ -12,9 +12,11 @@ package audioCompression.types;
 public class CompressedAudioFile implements AudioCompressionType {
 	
 	String m_compressedFilename;
+	int m_compressedSizeBytes;
 
-	public CompressedAudioFile(String filename) {
+	public CompressedAudioFile(String filename, int compressedSize) {
 		m_compressedFilename = filename;
+		m_compressedSizeBytes = compressedSize;
 	}
 	
 	/**

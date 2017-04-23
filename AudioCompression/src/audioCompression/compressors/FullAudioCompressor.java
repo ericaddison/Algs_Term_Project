@@ -32,7 +32,7 @@ public class FullAudioCompressor implements AudioCompressor {
 	
 	private MdctStep m_mdctStep = new MdctStep();
 	private AdaptiveLinesByteBufferizerStep adapt_LBB= new AdaptiveLinesByteBufferizerStep();
-	private LinesByteBufferizerStep m_LineBB = new LinesByteBufferizerStep();
+	private LinesByteBufferizerStep lineBB = new LinesByteBufferizerStep();
 	
 	/// Create the Sub-band byte bufferizers
 	private SubbandsByteBufferizerStep subBand_BB = new SubbandsByteBufferizerStep();
@@ -68,7 +68,7 @@ public class FullAudioCompressor implements AudioCompressor {
 	public void EnableAdaptiveEncoding(boolean enable)
 	{
 		// do stuff to the Huffman encoder to enable the adaptive encoding
-		// huffman.getClass();
+		// huffman.enableAdaptiveEncoding(enable);
 	}
 	
 	// Method for enabling / disabling the MDCT step
@@ -85,7 +85,7 @@ public class FullAudioCompressor implements AudioCompressor {
 			if (m_bAdaptiveByteBuffEnabled) {
 				pipeline.addStep(adapt_LBB, 2);
 			} else {
-				pipeline.addStep(m_LineBB, 2);
+				pipeline.addStep(lineBB, 2);
 			}
 			
 		} else {
@@ -100,8 +100,7 @@ public class FullAudioCompressor implements AudioCompressor {
 		}
 		if (!pipeline.isPipelineValid()) {
 			throw new IllegalArgumentException("CompressionPipeline: Invalid matching of output to input to next step");
-		}
-		
+		}		
 	}
 	
 	/// Method for enabling / disabling the Adaptive Byte Buffer vs Regular Byte Buffer
@@ -110,16 +109,39 @@ public class FullAudioCompressor implements AudioCompressor {
 		// if the adaptive byte bufferizer is already set properly, do nothing
 		if (m_bAdaptiveByteBuffEnabled == enable) { return; }
 		
+		int index = 1;
+		if (m_bMDCTEnabled) {
+			index = 2;
+		}
 		m_bAdaptiveByteBuffEnabled = enable;
+		pipeline.removeStep(index);
 		if (enable) {
 			// switch out regular for the adaptive
-			
-			
+			pipeline.addStep(m_bMDCTEnabled ? adapt_LBB : adaptSubBand_BB, index);		
 		} else {
-			
-			
+			pipeline.addStep(m_bMDCTEnabled ? lineBB : subBand_BB, index);			
 		}		
-		
 	}
 	
+	/// Sets the number of sub bands to be used in the Filter Bank
+	public void SetNumberOfSubBands(int num)
+	{
+		if (num == fBankStep.getnBands()) return;
+		
+		// otherwise, set the number of bands to use
+		fBankStep.setnBands(num);
+	}
+	
+	/// Sets the length of the filter bank (128, 256, ..., 4096)
+	public void SetFilterBankLength(int len)
+	{
+		//fBankStep.setBankLength(len);
+	}
+	
+	/// Sets the signal window size for how small to chop up the input signal (10 ... 1000)
+	public void SetSignalWindowSize(int winSize)
+	{
+		//fBankStep.setSignalWindowSize(winSize);
+	}
+		
 }
