@@ -35,12 +35,10 @@ public class FullAudioCompressor implements AudioCompressor {
 	private FilterBankStep fBankStep = new FilterBankStep();
 	
 	private MdctStep m_mdctStep = new MdctStep();
-	private LinesByteBufferizerStep adapt_LBB= new LinesByteBufferizerStep(true);
 	private LinesByteBufferizerStep lineBB = new LinesByteBufferizerStep();
 	
 	/// Create the Sub-band byte bufferizers
 	private SubbandsByteBufferizerStep subBand_BB = new SubbandsByteBufferizerStep();
-	private SubbandsByteBufferizerStep adaptSubBand_BB = new SubbandsByteBufferizerStep(true);
 	
 	/// Create the huffman encoder
 	private HuffmanEncoderStep huffman = new HuffmanEncoderStep();
@@ -85,23 +83,14 @@ public class FullAudioCompressor implements AudioCompressor {
 		m_bMDCTEnabled = enable;
 		if (enable) {
 			// we need to add the MDCT
-			pipeline.removeStep(1); // remove the sub-band byte bufferizer
-			pipeline.addStep(m_mdctStep, 1);
-			if (m_bAdaptiveByteBuffEnabled) {
-				pipeline.addStep(adapt_LBB, 2);
-			} else {
-				pipeline.addStep(lineBB, 2);
-			}
-			
+			pipeline.removeStep(2); // remove the sub-band byte bufferizer
+			pipeline.addStep(m_mdctStep, 2);
+			pipeline.addStep(lineBB, 3);		
 		} else {
 			// we need to remove the MDCT and Line byte bufferizers, and add the band byte bufferizers
-			pipeline.removeStep(1);
-			pipeline.removeStep(1);
-			if (m_bAdaptiveByteBuffEnabled) {
-				pipeline.addStep(adaptSubBand_BB, 1);
-			} else {
-				pipeline.addStep(subBand_BB, 1);
-			}
+			pipeline.removeStep(2);
+			pipeline.removeStep(2);
+			pipeline.addStep(subBand_BB, 2);
 		}
 		if (!pipeline.isPipelineValid()) {
 			throw new IllegalArgumentException("CompressionPipeline: Invalid matching of output to input to next step");
@@ -114,18 +103,10 @@ public class FullAudioCompressor implements AudioCompressor {
 		// if the adaptive byte bufferizer is already set properly, do nothing
 		if (m_bAdaptiveByteBuffEnabled == enable) { return; }
 		
-		int index = 1;
-		if (m_bMDCTEnabled) {
-			index = 2;
-		}
-		m_bAdaptiveByteBuffEnabled = enable;
-		pipeline.removeStep(index);
-		if (enable) {
-			// switch out regular for the adaptive
-			pipeline.addStep(m_bMDCTEnabled ? adapt_LBB : adaptSubBand_BB, index);		
-		} else {
-			pipeline.addStep(m_bMDCTEnabled ? lineBB : subBand_BB, index);			
-		}		
+		// regardless of which is active, this will toggle both, we don't really care which is 
+		//  currently in the pipeline
+		lineBB.setAdaptive(enable);
+		subBand_BB.setAdaptive(enable);	
 	}
 	
 	/// Sets the number of sub bands to be used in the Filter Bank
