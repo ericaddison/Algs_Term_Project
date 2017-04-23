@@ -34,11 +34,12 @@ public class SerializationStep implements AlgorithmStep<AudioByteBuffer, Compres
 		// TODO Auto-generated method stub
 		
 		//long fileSize = 0;
-		
+		int fileSize = 0;
 		try {
 			File file = new File(name);
 			FileOutputStream strm = new FileOutputStream(file, false); 
 			FileChannel channel = strm.getChannel();
+			fileSize = input.getBuffer().remaining();
 			
 			// Writes a sequence of bytes to this channel from the given buffer.
 			channel.write(input.getBuffer());
@@ -51,7 +52,7 @@ public class SerializationStep implements AlgorithmStep<AudioByteBuffer, Compres
             System.exit(1);
 		}	
 		
-		return new CompressedAudioFile(name);
+		return new CompressedAudioFile(name, fileSize);
 	}
 
 	@Override

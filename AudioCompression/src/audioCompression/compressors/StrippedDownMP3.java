@@ -10,6 +10,7 @@ import audioCompression.types.RawAudio;
  * <ul>
  * <li> a polyphase filter bank</li>
  * <li> a modified discrete cosine transform (MDCT)</li>
+ * <li> a byte bufferizer from line / sub-band data</li>
  * <li> huffman encoding</li>
  * <li> serialization</li>
  * </ul>
