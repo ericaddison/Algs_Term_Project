@@ -37,7 +37,6 @@ public class MdctStepDemo {
 		LinesByteBufferizerStep lbb = new LinesByteBufferizerStep();
 		lbb.setAdaptive(true);
 		
-		
 		String fileName = "testName";
 		
 		long t1 = System.currentTimeMillis();

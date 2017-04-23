@@ -1,6 +1,7 @@
 package audioCompression.compressors;
 
 import audioCompression.algorithm.*;
+import audioCompression.algorithm.dsp.window.HannWindow;
 import audioCompression.types.*;
 
 /**
@@ -31,12 +32,12 @@ public class FullAudioCompressor implements AudioCompressor {
 	private FilterBankStep fBankStep = new FilterBankStep();
 	
 	private MdctStep m_mdctStep = new MdctStep();
-	private AdaptiveLinesByteBufferizerStep adapt_LBB= new AdaptiveLinesByteBufferizerStep();
+	private LinesByteBufferizerStep adapt_LBB= new LinesByteBufferizerStep(true);
 	private LinesByteBufferizerStep lineBB = new LinesByteBufferizerStep();
 	
 	/// Create the Sub-band byte bufferizers
 	private SubbandsByteBufferizerStep subBand_BB = new SubbandsByteBufferizerStep();
-	private AdaptiveSubbandsByteBufferizerStep adaptSubBand_BB = new AdaptiveSubbandsByteBufferizerStep();
+	private SubbandsByteBufferizerStep adaptSubBand_BB = new SubbandsByteBufferizerStep(true);
 	
 	/// Create the huffman encoder
 	private HuffmanEncoderStep huffman = new HuffmanEncoderStep();
@@ -133,9 +134,10 @@ public class FullAudioCompressor implements AudioCompressor {
 	}
 	
 	/// Sets the length of the filter bank (128, 256, ..., 4096)
+	/// using a fixed window type of Hann window
 	public void SetFilterBankLength(int len)
 	{
-		//fBankStep.setBankLength(len);
+		fBankStep.setFilterWindow(new HannWindow(len));
 	}
 	
 	/// Sets the signal window size for how small to chop up the input signal (10 ... 1000)
