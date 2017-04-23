@@ -6,9 +6,20 @@ import audioCompression.algorithm.bytes.ByteUtils;
 import audioCompression.types.AudioByteBuffer;
 import audioCompression.types.AudioCompressionType;
 import audioCompression.types.Lines;
-import audioCompression.types.Subbands;
 
 public class LinesByteBufferizerStep implements AlgorithmStep<Lines, AudioByteBuffer>{
+
+	
+	private boolean adaptive = false;
+	
+	public boolean isAdaptive() {
+		return adaptive;
+	}
+
+
+	public void setAdaptive(boolean adaptive) {
+		this.adaptive = adaptive;
+	}
 
 
 	@Override
@@ -23,6 +34,8 @@ public class LinesByteBufferizerStep implements AlgorithmStep<Lines, AudioByteBu
 		
 		int capacity = 6*(Integer.SIZE/Byte.SIZE)
 				+ nChannels * nBands * nWindows * samplesPerWindow * byteDepth;
+		
+		capacity += (adaptive)?(nChannels * nBands * nWindows * 2*(Float.SIZE/Byte.SIZE)):0;
 		
 		// create byte buffer
 		ByteBuffer bytes = ByteBuffer.allocate(capacity);  
@@ -41,8 +54,17 @@ public class LinesByteBufferizerStep implements AlgorithmStep<Lines, AudioByteBu
 			for(int iband = 0; iband < nBands; iband++)
 				for(int iwin = 0; iwin < nWindows; iwin++)
 					for(int isamp = 0; isamp < samplesPerWindow; isamp++){
-						byte[] sampBytes = 
-								ByteUtils.float2bytes(samples[ichan][iband][iwin][isamp], byteDepth, -1, 1);
+						byte[] sampBytes;
+						float[] minMax;
+						if(adaptive){
+							minMax = ByteUtils.getMinMax(samples[ichan][iband][iwin]);
+							bytes.putFloat(minMax[0]);
+							bytes.putFloat(minMax[1]);
+						} else {
+							minMax = new float[] {-1, 1};
+						}
+						sampBytes = 
+								ByteUtils.float2bytes(samples[ichan][iband][iwin][isamp], byteDepth, minMax[0], minMax[1]);
 						bytes.put(sampBytes);
 					}
 		
@@ -67,9 +89,13 @@ public class LinesByteBufferizerStep implements AlgorithmStep<Lines, AudioByteBu
 				for(int iwin = 0; iwin < nWindows; iwin++)
 					for(int isamp = 0; isamp < samplesPerWindow; isamp++){
 						byte[] nextVal = new byte[byteDepth];
+						
+						float minVal = (adaptive)?input.getBuffer().getFloat():-1;
+						float maxVal = (adaptive)?input.getBuffer().getFloat():1;
+						
 						for(int i=0; i<byteDepth; i++)
 							nextVal[i] = input.getBuffer().get();
-						float f = ByteUtils.bytes2float(nextVal, byteDepth, -1, 1);
+						float f = ByteUtils.bytes2float(nextVal, byteDepth, minVal, maxVal);
 							
 						windows[ichan][iband][iwin][isamp] = f;
 					}		

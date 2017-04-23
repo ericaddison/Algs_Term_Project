@@ -28,6 +28,36 @@ public class FilterBankStep implements AlgorithmStep<RawAudio, Subbands> {
 	}
 	
 	
+	/**
+	 * Set the window used to create the baseline lowpass filter for the filterbank.
+	 * This parameter defines both the type of window and the length of the filter.
+	 * @param w
+	 */
+	public void setFilterWindow(Window w, int length){
+		w.setLength(length);
+		this.w = w;
+	}
+	
+	public Window getFilterWindow(){
+		return w;
+	}
+	
+	public int getFilterWindowLength(){
+		return w.getLength();
+	}
+	
+	public void setNbands(int nBands){
+		if(nBands<1)
+			throw new IllegalArgumentException("Filterbank requires nBands>0");
+		
+		this.nBands = nBands;
+	}
+	
+	public int getNbands(){
+		return nBands;
+	}
+	
+	
 	@Override
 	public Subbands forward(RawAudio input, String fileName) {
 		if(input.getNChannels()>1)

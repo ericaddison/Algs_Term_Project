@@ -1,6 +1,5 @@
 package audioCompression.algorithm;
 
-import java.util.Arrays;
 import java.util.Iterator;
 
 import audioCompression.algorithm.dsp.MDCT;

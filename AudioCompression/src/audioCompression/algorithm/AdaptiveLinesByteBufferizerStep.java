@@ -6,7 +6,6 @@ import audioCompression.algorithm.bytes.ByteUtils;
 import audioCompression.types.AudioByteBuffer;
 import audioCompression.types.AudioCompressionType;
 import audioCompression.types.Lines;
-import audioCompression.types.Subbands;
 
 public class AdaptiveLinesByteBufferizerStep extends LinesByteBufferizerStep implements AlgorithmStep<Lines, AudioByteBuffer>{
 
