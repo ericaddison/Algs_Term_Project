@@ -28,6 +28,9 @@ public class FullAudioCompressor implements AudioCompressor {
 	private boolean m_bMDCTEnabled;
 	private boolean m_bAdaptiveByteBuffEnabled;
 	
+	// Create the InputOutput step for the front end of the pipeline
+	private InputOutputStep io = new InputOutputStep();
+	
 	// Create and keep a pointer to the filterbank, for easier configuration
 	private FilterBankStep fBankStep = new FilterBankStep();
 	
@@ -47,6 +50,7 @@ public class FullAudioCompressor implements AudioCompressor {
 		m_bMDCTEnabled = false;
 		m_bAdaptiveByteBuffEnabled = false;		
 		
+		pipeline.addStep(io);
 		pipeline.addStep(fBankStep);
 		pipeline.addStep(subBand_BB);
 		pipeline.addStep(huffman);
@@ -143,7 +147,7 @@ public class FullAudioCompressor implements AudioCompressor {
 	/// Sets the signal window size for how small to chop up the input signal (10 ... 1000)
 	public void SetSignalWindowSize(int winSize)
 	{
-		//fBankStep.setSignalWindowSize(winSize);
+		io.setWindowLength(winSize);
 	}
 		
 }

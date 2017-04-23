@@ -23,6 +23,7 @@ public class StrippedDownMP3 implements AudioCompressor{
 	private CompressionPipeline pipeline = new CompressionPipeline();
 	
 	public StrippedDownMP3() {
+		pipeline.addStep(new InputOutputStep());
 		pipeline.addStep(new FilterBankStep());
 		pipeline.addStep(new MdctStep());
 		pipeline.addStep(new LinesByteBufferizerStep());
