@@ -2,13 +2,19 @@ package audioCompression.algorithm;
 
 import java.nio.ByteBuffer;
 
-import audioCompression.algorithm.bytes.ByteUtils;
 import audioCompression.types.AudioByteBuffer;
 import audioCompression.types.AudioCompressionType;
 import audioCompression.types.Subbands;
 
-public class SubbandsByteBufferizerStep implements AlgorithmStep<Subbands, AudioByteBuffer>{
+public class SubbandsByteBufferizerStep extends ByteBufferizer implements AlgorithmStep<Subbands, AudioByteBuffer>{
 
+	public SubbandsByteBufferizerStep(boolean adaptive) {
+		this.adaptive = adaptive;
+	}
+	
+	public SubbandsByteBufferizerStep() {
+		this(false);
+	}
 
 	@Override
 	public AudioByteBuffer forward(Subbands input, String fileName) {
@@ -22,6 +28,8 @@ public class SubbandsByteBufferizerStep implements AlgorithmStep<Subbands, Audio
 		
 		int capacity = 7*(Integer.SIZE/Byte.SIZE) 
 				+ nChannels * nBands * nWindows * samplesPerWindow * byteDepth;
+		
+		capacity += (adaptive)?(nChannels * nBands * nWindows * 2*(Float.SIZE/Byte.SIZE)):0;
 		
 		// create byte buffer
 		ByteBuffer bytes = ByteBuffer.allocate(capacity);  
@@ -37,14 +45,8 @@ public class SubbandsByteBufferizerStep implements AlgorithmStep<Subbands, Audio
 		
 		// write out samples in channel/band/window/sample order
 		float[][][][] samples = input.getAllWindows();
-		for(int ichan = 0; ichan < nChannels; ichan++)
-			for(int iband = 0; iband < nBands; iband++)
-				for(int iwin = 0; iwin < nWindows; iwin++)
-					for(int isamp = 0; isamp < samplesPerWindow; isamp++){
-						byte[] sampBytes = 
-								ByteUtils.float2bytes(samples[ichan][iband][iwin][isamp], byteDepth, -1, 1);
-						bytes.put(sampBytes);
-					}
+		putChanBandWindowSamples(samples, bytes, byteDepth);
+		
 		
 		bytes.rewind();
 		return new AudioByteBuffer(bytes);
@@ -63,19 +65,7 @@ public class SubbandsByteBufferizerStep implements AlgorithmStep<Subbands, Audio
 		int byteDepth = input.getBuffer().getInt();
 
 		float[][][][] windows = new float[nChannels][nBands][nWindows][samplesPerWindow];
-		for(int ichan = 0; ichan < nChannels; ichan++)
-			for(int iband = 0; iband < nBands; iband++)
-				for(int iwin = 0; iwin < nWindows; iwin++)
-					for(int isamp = 0; isamp < samplesPerWindow; isamp++){
-						byte[] nextVal = new byte[byteDepth];
-						for(int i=0; i<byteDepth; i++)
-							nextVal[i] = input.getBuffer().get();
-						float f = ByteUtils.bytes2float(nextVal, byteDepth,-1, 1);
-							
-						windows[ichan][iband][iwin][isamp] = f;
-					}		
-		
-		
+		getChanBandWindowSamples(windows, input.getBuffer(), byteDepth);	
 			
 		return new Subbands(sampleRate, nWindows, 
 				samplesPerWindow, windowOverlap, 

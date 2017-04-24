@@ -34,8 +34,8 @@ public class MdctStepDemo {
 		WavAudioInput audio = new WavAudioInput(new File(filename), winSize, winOverlap);
 		FilterBankStep fb = new FilterBankStep(nbands, new HannWindow(fN));
 		MdctStep mdct = new MdctStep();
-		//LinesByteBufferizerStep lbb = new LinesByteBufferizerStep();
-		LinesByteBufferizerStep lbb = new AdaptiveLinesByteBufferizerStep();
+		LinesByteBufferizerStep lbb = new LinesByteBufferizerStep();
+		lbb.setAdaptive(true);
 		
 		String fileName = "testName";
 		

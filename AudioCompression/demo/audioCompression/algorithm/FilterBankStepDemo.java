@@ -47,7 +47,7 @@ public class FilterBankStepDemo {
 			System.out.println("WARNING! winsize and overlap incompatible!");
 		WavAudioInput audio = new WavAudioInput(new File(filename), winSize, 0);
 		FilterBankStep fb = new FilterBankStep(nbands, w);
-		SubbandsByteBufferizerStep sbb = new AdaptiveSubbandsByteBufferizerStep();
+		SubbandsByteBufferizerStep sbb = new SubbandsByteBufferizerStep(true);
 		
 		String fileName = "testName";
 		
