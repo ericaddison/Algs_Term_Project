@@ -73,6 +73,7 @@ public class FullCompressionDemo {
 		
 		demo.RunTest1(files);		
 		
+		System.out.println("----------------------\n-- Test 1 complete --\n----------------------");
 	}
 
 	

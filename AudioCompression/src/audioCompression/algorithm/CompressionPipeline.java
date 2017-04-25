@@ -17,7 +17,7 @@ import audioCompression.types.AudioCompressionType;
 @SuppressWarnings("rawtypes")
 public class CompressionPipeline {
 
-	private LinkedList<AlgorithmStep> pipeline = new LinkedList<>();
+	protected LinkedList<AlgorithmStep> pipeline = new LinkedList<>();
 	
 	
 	/**
@@ -59,7 +59,7 @@ public class CompressionPipeline {
 	}
 	
 	// These enums describe the pipeline stage for triggering the pipeline callback
-	enum PipelineStage {
+	public enum PipelineStage {
 		STAGE_FORWARD_BEGIN,
 		STAGE_FORWARD_INTERMEDIATE,
 		STAGE_FORWARD_END,
@@ -68,7 +68,15 @@ public class CompressionPipeline {
 		STAGE_REVERSE_END
 	};
 	
-	private void OnPipelineEvent(PipelineStage stage, String prevStage, String nextStage)
+	/**
+	 * This function handles the intermediate steps of the compress and decompress pipeline,
+	 * this provides a handle to capture step specific metrics, ie time etc.
+	 * @param stage		Enum of which part of the cycle is happening, start, middle, end
+	 * @param nextIndex	Index of the next step that will be ran, invalid for end stage type (there is no next step)
+	 * @param prevStage	Name of previous stage performed
+	 * @param nextStage	Name of next stage to be performed
+	 */
+	protected void OnPipelineEvent(PipelineStage stage, int nextIndex, String prevStage, String nextStage)
 	{
 		String msg = "- Pipeline Event ";
 		if (stage == PipelineStage.STAGE_FORWARD_BEGIN) {
@@ -104,8 +112,9 @@ public class CompressionPipeline {
 					+ ", got " + input.getClass());
 		
 		// Trigger alert event that pipeline has begun
-		OnPipelineEvent(PipelineStage.STAGE_FORWARD_BEGIN, "--", pipeline.getFirst().getName());
+		OnPipelineEvent(PipelineStage.STAGE_FORWARD_BEGIN, 0, "--", pipeline.getFirst().getName());
 		
+		int stepIndex = 0;
 		Iterator<AlgorithmStep> iter = pipeline.iterator();
 		AudioCompressionType workingData = input;
 		AlgorithmStep prevStep = null;
@@ -113,16 +122,17 @@ public class CompressionPipeline {
 		while(iter.hasNext()){
 			AlgorithmStep nextStep = iter.next();
 			if (first) {
-				OnPipelineEvent(PipelineStage.STAGE_FORWARD_INTERMEDIATE, 
+				OnPipelineEvent(PipelineStage.STAGE_FORWARD_INTERMEDIATE, stepIndex, 
 						prevStep.getName(), nextStep.getName());
 			}
 			workingData = nextStep.forward(workingData, name);
+			stepIndex++;
 			prevStep = nextStep;
 			first = true;
 		}
 		
 		// Trigger alert event that pipeline has finished
-		OnPipelineEvent(PipelineStage.STAGE_FORWARD_END, pipeline.getLast().getName(), "--");
+		OnPipelineEvent(PipelineStage.STAGE_FORWARD_END, 0, pipeline.getLast().getName(), "--");
 		
 		return workingData;
 	}
@@ -142,8 +152,10 @@ public class CompressionPipeline {
 					+ "expected " + pipeline.getLast().getOutputClass() 
 					+ ", got " + input.getClass());
 		
+		int nextIndex = pipeline.size() - 1;
+		
 		// Trigger alert event that pipeline has begun
-		OnPipelineEvent(PipelineStage.STAGE_REVERSE_BEGIN, "--", pipeline.getLast().getName());
+		OnPipelineEvent(PipelineStage.STAGE_REVERSE_BEGIN, nextIndex, "--", pipeline.getLast().getName());
 				
 		Iterator<AlgorithmStep> iter = pipeline.descendingIterator();
 		AudioCompressionType workingData = input;
@@ -152,16 +164,17 @@ public class CompressionPipeline {
 		while(iter.hasNext()){
 			AlgorithmStep nextStep = iter.next();
 			if (first) {
-				OnPipelineEvent(PipelineStage.STAGE_REVERSE_INTERMEDIATE, 
+				OnPipelineEvent(PipelineStage.STAGE_REVERSE_INTERMEDIATE, nextIndex, 
 						prevStep.getName(), nextStep.getName());
 			}			
 			workingData = nextStep.reverse(workingData, name);
 			prevStep = nextStep;
+			nextIndex--;
 			first = true;
 		}
 		
 		// Trigger alert event that pipeline has finished
-		OnPipelineEvent(PipelineStage.STAGE_REVERSE_END, pipeline.getFirst().getName(), "--");
+		OnPipelineEvent(PipelineStage.STAGE_REVERSE_END, -1, pipeline.getFirst().getName(), "--");
 				
 		return workingData;
 	}
