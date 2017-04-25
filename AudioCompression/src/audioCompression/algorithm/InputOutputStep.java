@@ -11,7 +11,8 @@ public class InputOutputStep implements AlgorithmStep<AudioFile, RawAudio>{
 
 	private int windowLength = 1024;
 	private int windowOverlap = 0;
-	private WavAudioInput wav;
+	private RawAudio inputAudio;
+	private RawAudio outputWav;
 	private float rmsError;
 	
 	public int getWindowLength() {
@@ -33,18 +34,27 @@ public class InputOutputStep implements AlgorithmStep<AudioFile, RawAudio>{
 	public float getRmsError() {
 		return rmsError;
 	}
+	
+	public RawAudio getInputAudio() {
+		return inputAudio;
+	}
+
+	public RawAudio getOutputWav() {
+		return outputWav;
+	}
 
 	@Override
 	public RawAudio forward(AudioFile input, String name) {
-		wav = new WavAudioInput(new File(input.getFilename()), windowLength, windowOverlap);
-		return wav;
+		inputAudio = new WavAudioInput(new File(input.getFilename()), windowLength, windowOverlap);
+		return inputAudio;
 	}
 
 	@Override
 	public AudioFile reverse(RawAudio input, String name) {
 		input.writeFile(name);
-		rmsError = rmsDiff(wav.getAudioBuffer((int)wav.getNSamples())[0], 
-				input.getAudioBuffer((int)wav.getNSamples())[0]);
+		rmsError = rmsDiff(inputAudio.getAudioBuffer((int)inputAudio.getNSamples())[0], 
+				input.getAudioBuffer((int)inputAudio.getNSamples())[0]);
+		outputWav = input;
 		return new AudioFile(name);
 	}
 
@@ -64,7 +74,6 @@ public class InputOutputStep implements AlgorithmStep<AudioFile, RawAudio>{
 	}
 	
 	private static float rmsDiff(float[] arr1, float[] arr2){
-		System.out.println(arr1.length + ", " + arr2.length);
 		if(arr1.length<arr2.length)
 			throw new IllegalArgumentException("arr1.length<arr2.length");
 		float rms = 0;
