@@ -7,6 +7,7 @@ import java.util.Iterator;
 import edu.mines.jtk.mosaic.PlotFrame;
 import edu.mines.jtk.mosaic.PlotPanel;
 import edu.mines.jtk.mosaic.PointsView;
+import audioCompression.ByteRestrictionAcousticModel;
 import audioCompression.algorithm.dsp.CosineModulatedFilterBank;
 import audioCompression.algorithm.dsp.window.HammingWindow;
 import audioCompression.algorithm.dsp.window.HannWindow;
@@ -33,9 +34,9 @@ public class FilterBankStepDemo {
 	
 	public static void main(String[] args){
 		// adjustable parameters
-		int nbands = 16;				// number of subbands 2, 4, 8, 16, 32, 64
+		int nbands = 2;				// number of subbands 2, 4, 8, 16, 32, 64
 		int fN = 2*512;					// length of the filter-bank filter, 128, 256, 512, 1024, 2048, 4096
-		int winSize = 50*nbands;		// size of signal window
+		int winSize = 1000*nbands;		// size of signal window
 		Window w = new HannWindow(fN);	// window used to construct filter
 		
 		// I think there might be some offset problem with too many bands (or channels)!!!
@@ -48,6 +49,7 @@ public class FilterBankStepDemo {
 		WavAudioInput audio = new WavAudioInput(new File(filename), winSize, 0);
 		FilterBankStep fb = new FilterBankStep(nbands, w);
 		SubbandsByteBufferizerStep sbb = new SubbandsByteBufferizerStep(true);
+		sbb.setPsychoAcousticModel(new ByteRestrictionAcousticModel(audio.getSampleRate(), 0, 10000));
 		
 		String fileName = "testName";
 		
@@ -60,6 +62,10 @@ public class FilterBankStepDemo {
 		AudioByteBuffer abb = sbb.forward(sub, fileName);
 		t2 = System.currentTimeMillis();
 		System.out.println("bufferizer forward time: " + (t2-t1) + "ms");
+		
+		System.out.println("\nByteBuffer size = " + abb.getBuffer().capacity() + "\n");
+		(new SerializationStep()).forward(abb, "../output_wavs/" + FilterBankStepDemo.class.getSimpleName() + ".jet");
+		
 		
 		t1 = System.currentTimeMillis();
 		Subbands sub2 = sbb.reverse(abb, fileName);
@@ -119,7 +125,7 @@ public class FilterBankStepDemo {
 		pv.setLineColor(Color.red);
 		plot.setSize(500, 400);
 		plot.setDefaultCloseOperation(PlotFrame.EXIT_ON_CLOSE);
-		plot.setVisible(true);
+//		plot.setVisible(true);
 		
 	}
 	
