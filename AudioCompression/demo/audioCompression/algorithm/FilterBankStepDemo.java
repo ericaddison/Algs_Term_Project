@@ -34,9 +34,9 @@ public class FilterBankStepDemo {
 	
 	public static void main(String[] args){
 		// adjustable parameters
-		int nbands = 2;				// number of subbands 2, 4, 8, 16, 32, 64
-		int fN = 2*512;					// length of the filter-bank filter, 128, 256, 512, 1024, 2048, 4096
-		int winSize = 1000*nbands;		// size of signal window
+		int nbands = 8;				// number of subbands 2, 4, 8, 16, 32, 64
+		int fN = 4*512;					// length of the filter-bank filter, 128, 256, 512, 1024, 2048, 4096
+		int winSize = 100*nbands;		// size of signal window
 		Window w = new HannWindow(fN);	// window used to construct filter
 		
 		// I think there might be some offset problem with too many bands (or channels)!!!
@@ -125,7 +125,7 @@ public class FilterBankStepDemo {
 		pv.setLineColor(Color.red);
 		plot.setSize(500, 400);
 		plot.setDefaultCloseOperation(PlotFrame.EXIT_ON_CLOSE);
-//		plot.setVisible(true);
+	//	plot.setVisible(true);
 		
 	}
 	
