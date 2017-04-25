@@ -4,11 +4,11 @@ import java.io.File;
 
 import libs.wavParser.WavFile;
 import audioCompression.compressors.StrippedDownMP3;
+import audioCompression.compressors.FullAudioCompressor;
 
 public class FileCompressDemo {
-
-//	private StrippedDownMP3 pipeline;
 	
+	protected FullAudioCompressor fComp = new FullAudioCompressor();
 	
 	public static void RunTest(File file)
 	{

@@ -58,6 +58,18 @@ public class CompressionPipeline {
 	
 	}
 	
+	// These enums describe the pipeline stage for triggering the pipeline callback
+	enum PipelineStage {
+		STAGE_FORWARD_BEGIN,
+		STAGE_FORWARD_INTERMEDIATE,
+		STAGE_FORWARD_END,
+		STAGE_REVERSE_BEGIN,
+		STAGE_REVERSE_INTERMEDIATE,
+		STAGE_REVERSE_END
+	};
+	
+	private void OnPipelineEvent(PipelineStage stage, String prevStage, String nextStage) {}
+	
 	
 	/**
 	 * Process an input dataset through the pipeline in the 
@@ -72,6 +84,8 @@ public class CompressionPipeline {
 					+ "input type to processForward() -- "
 					+ "expected " + pipeline.getFirst().getInputClass() 
 					+ ", got " + input.getClass());
+		
+		OnPipelineEvent(STAGE_FORWARD_BEGIN, "", pipeline.getFirst().getName());
 		
 		Iterator<AlgorithmStep> iter = pipeline.iterator();
 		AudioCompressionType workingData = input;
