@@ -72,11 +72,17 @@ public class CompressionPipeline {
 	{
 		String msg = "- Pipeline Event ";
 		if (stage == PipelineStage.STAGE_FORWARD_BEGIN) {
-			msg += "Begin - ";
+			msg += "Forward Begin with " + nextStage + " - ";
 		} else if (stage == PipelineStage.STAGE_FORWARD_INTERMEDIATE) {
-			msg += "Between " + prevStage + " and " + nextStage + " -"; 
+			msg += "Forward Between " + prevStage + " and " + nextStage + " -"; 
 		} else if (stage == PipelineStage.STAGE_FORWARD_END) {
-			msg += "Ending -"; 
+			msg += "Forward Ending -"; 
+		} else if (stage == PipelineStage.STAGE_REVERSE_BEGIN) {
+			msg += "Reverse Begin - ";
+		} else if (stage == PipelineStage.STAGE_REVERSE_INTERMEDIATE) {
+			msg += "Reverse Between " + prevStage + " and " + nextStage + " -"; 
+		} else if (stage == PipelineStage.STAGE_REVERSE_END) {
+			msg += "Reverse Ending -"; 
 		}
 		msg += "\n";
 		System.out.printf(msg);
@@ -97,6 +103,7 @@ public class CompressionPipeline {
 					+ "expected " + pipeline.getFirst().getInputClass() 
 					+ ", got " + input.getClass());
 		
+		// Trigger alert event that pipeline has begun
 		OnPipelineEvent(PipelineStage.STAGE_FORWARD_BEGIN, "--", pipeline.getFirst().getName());
 		
 		Iterator<AlgorithmStep> iter = pipeline.iterator();
@@ -114,6 +121,7 @@ public class CompressionPipeline {
 			first = true;
 		}
 		
+		// Trigger alert event that pipeline has finished
 		OnPipelineEvent(PipelineStage.STAGE_FORWARD_END, pipeline.getLast().getName(), "--");
 		
 		return workingData;
@@ -134,12 +142,27 @@ public class CompressionPipeline {
 					+ "expected " + pipeline.getLast().getOutputClass() 
 					+ ", got " + input.getClass());
 		
+		// Trigger alert event that pipeline has begun
+		OnPipelineEvent(PipelineStage.STAGE_REVERSE_BEGIN, "--", pipeline.getLast().getName());
+				
 		Iterator<AlgorithmStep> iter = pipeline.descendingIterator();
 		AudioCompressionType workingData = input;
+		AlgorithmStep prevStep = null;
+		boolean first = false;
 		while(iter.hasNext()){
-			AlgorithmStep nextStep = iter.next(); 
+			AlgorithmStep nextStep = iter.next();
+			if (first) {
+				OnPipelineEvent(PipelineStage.STAGE_REVERSE_INTERMEDIATE, 
+						prevStep.getName(), nextStep.getName());
+			}			
 			workingData = nextStep.reverse(workingData, name);
+			prevStep = nextStep;
+			first = true;
 		}
+		
+		// Trigger alert event that pipeline has finished
+		OnPipelineEvent(PipelineStage.STAGE_REVERSE_END, pipeline.getFirst().getName(), "--");
+				
 		return workingData;
 	}
 	
