@@ -2,6 +2,7 @@ package audioCompression.algorithm;
 
 import java.nio.ByteBuffer;
 
+import audioCompression.ByteRestrictionAcousticModel;
 import audioCompression.types.AudioByteBuffer;
 import audioCompression.types.AudioCompressionType;
 import audioCompression.types.Subbands;
@@ -31,9 +32,14 @@ public class SubbandsByteBufferizerStep extends ByteBufferizer implements Algori
 		
 		capacity += (adaptive)?(nChannels * nBands * nWindows * 2*(Float.SIZE/Byte.SIZE)):0;
 		
+		// setup model
+		if(model==null)
+			model = new ByteRestrictionAcousticModel(sampleRate, 0, sampleRate/2.0f);
+		model.setSampleRate(sampleRate);
+		
 		// create byte buffer
 		ByteBuffer bytes = ByteBuffer.allocate(capacity);  
-		
+
 		// write out top level meta-data
 		bytes.putInt(sampleRate);
 		bytes.putInt(nWindows);
@@ -45,11 +51,17 @@ public class SubbandsByteBufferizerStep extends ByteBufferizer implements Algori
 		
 		// write out samples in channel/band/window/sample order
 		float[][][][] samples = input.getAllWindows();
-		putChanBandWindowSamples(samples, bytes, byteDepth);
+		int written = putChanBandWindowSamples(samples, bytes, byteDepth);
 		
-		
+		// copy into new bytebuffer with proper length
 		bytes.rewind();
-		return new AudioByteBuffer(bytes);
+		int newCap = written + 7*(Integer.SIZE/Byte.SIZE);
+		ByteBuffer newBuf = ByteBuffer.allocate(newCap);
+		for(int i=0; i<newCap; i++)
+			newBuf.put(bytes.get());
+		
+		newBuf.rewind();
+		return new AudioByteBuffer(newBuf);
 	}
 
 	
@@ -64,6 +76,11 @@ public class SubbandsByteBufferizerStep extends ByteBufferizer implements Algori
 		int windowOverlap = input.getBuffer().getInt();
 		int byteDepth = input.getBuffer().getInt();
 
+		if(model==null)
+			model = new ByteRestrictionAcousticModel(sampleRate, 0, 1/(2.0f*sampleRate));
+		model.setSampleRate(sampleRate);
+		
+		
 		float[][][][] windows = new float[nChannels][nBands][nWindows][samplesPerWindow];
 		getChanBandWindowSamples(windows, input.getBuffer(), byteDepth);	
 			
