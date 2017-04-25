@@ -78,7 +78,7 @@ public class CompressionPipeline {
 		} else if (stage == PipelineStage.STAGE_FORWARD_END) {
 			msg += "Forward Ending -"; 
 		} else if (stage == PipelineStage.STAGE_REVERSE_BEGIN) {
-			msg += "Reverse Begin - ";
+			msg += "Reverse Begin with " + nextStage + " - ";
 		} else if (stage == PipelineStage.STAGE_REVERSE_INTERMEDIATE) {
 			msg += "Reverse Between " + prevStage + " and " + nextStage + " -"; 
 		} else if (stage == PipelineStage.STAGE_REVERSE_END) {

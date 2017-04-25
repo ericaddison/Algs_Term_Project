@@ -130,5 +130,25 @@ public class FullAudioCompressor implements AudioCompressor {
 	{
 		io.setWindowLength(winSize);
 	}
-		
+	
+	public void AddMetricTitles(StringBuilder sb)
+	{
+		sb.append("WindowLength,");
+		sb.append("NumSubBands_FilterBank,");
+		sb.append("FilterBankLength,");
+		sb.append("Adaptive Byte Buff,");
+	}
+	
+	public void AddMetrics(StringBuilder sb)
+	{
+		sb.append(String.valueOf(io.getWindowLength()));
+		sb.append(",");
+		sb.append(String.valueOf(fBankStep.getnBands()));
+		sb.append(",");
+		sb.append(String.valueOf(fBankStep.getFilterWindowLength()));
+		sb.append(",");
+		sb.append(String.valueOf(m_bAdaptiveByteBuffEnabled));
+		sb.append(",");
+	}
+	
 }

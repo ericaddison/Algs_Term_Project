@@ -1,7 +1,6 @@
 package audioCompression.compressors;
 
 import audioCompression.types.CompressedAudioFile;
-import audioCompression.types.RawAudio;
 import audioCompression.types.AudioCompressionType;
 import audioCompression.types.AudioFile;
 

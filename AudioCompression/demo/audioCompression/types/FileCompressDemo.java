@@ -29,10 +29,10 @@ public class FileCompressDemo {
 	
 		long endTime = System.nanoTime();
 		
-		long compressTime = midTime - startTime;
-		long decompressTime = endTime - midTime;
+		double compressTime = (double)(midTime - startTime) / 1000000.0;
+		double decompressTime = (double)(endTime - midTime) / 1000000.0;
 		
-		System.out.println("Compression Time of " + file.getName() + " was " + String.valueOf(compressTime) + " and decompress Time was " + String.valueOf(decompressTime));
+		System.out.println("Compression Time of " + file.getName() + " was " + String.valueOf(compressTime) + " (ms) and decompress Time was " + String.valueOf(decompressTime) + " (ms)");
 		
 	}
 	
