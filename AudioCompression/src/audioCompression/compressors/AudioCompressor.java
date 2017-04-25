@@ -2,7 +2,8 @@ package audioCompression.compressors;
 
 import audioCompression.types.CompressedAudioFile;
 import audioCompression.types.RawAudio;
-
+import audioCompression.types.AudioCompressionType;
+import audioCompression.types.AudioFile;
 
 /**
  * Interface to define operation of our AudioCompressors.
@@ -12,8 +13,8 @@ import audioCompression.types.RawAudio;
  */
 public interface AudioCompressor {
 
-	public CompressedAudioFile compress(RawAudio rawInput, String compressedName);
+	public CompressedAudioFile compress(AudioCompressionType input, String compressedName);
 	
-	public RawAudio decompress(CompressedAudioFile compressedInput, String decompressName);
+	public AudioFile decompress(CompressedAudioFile compressedInput, String decompressName);
 	
 }

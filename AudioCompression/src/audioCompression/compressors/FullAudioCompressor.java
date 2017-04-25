@@ -57,13 +57,13 @@ public class FullAudioCompressor implements AudioCompressor {
 	}
 	
 	@Override // compress the given input file
-	public CompressedAudioFile compress(RawAudio rawInput, String compressedName) {
-		return (CompressedAudioFile) pipeline.processForward(rawInput, compressedName);
+	public CompressedAudioFile compress(AudioCompressionType input, String compressedName) {
+		return (CompressedAudioFile) pipeline.processForward(input, compressedName);
 	}
 
 	@Override // decompress the given input file
-	public RawAudio decompress(CompressedAudioFile compressedInput, String decompressName) {
-		return (RawAudio) pipeline.processReverse(compressedInput, decompressName);
+	public AudioFile decompress(CompressedAudioFile compressedInput, String decompressName) {
+		return (AudioFile) pipeline.processReverse(compressedInput, decompressName);
 	}
 
 	// Method for toggling the adaptive encoding of the Huffman Step
