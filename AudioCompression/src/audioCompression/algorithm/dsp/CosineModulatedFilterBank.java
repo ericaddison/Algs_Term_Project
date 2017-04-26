@@ -11,7 +11,6 @@ public class CosineModulatedFilterBank {
 	
 	public CosineModulatedFilterBank(int nBands, Window w) {
 		this.prototypeFilter = FilterFactory.makeLowpassFilter(0.5f/(nBands), w);
-		System.out.println("Fiter length = " + w.getLength());
 		this.nBands = nBands;
 		filters = new Filter[nBands];
 		decimatedFilters = new Filter[nBands];

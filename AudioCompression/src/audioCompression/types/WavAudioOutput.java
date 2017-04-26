@@ -95,8 +95,6 @@ public class WavAudioOutput implements RawAudio{
 				buffer[ichan][i] = nextWin[ichan][i];
 		}
 
-		System.out.println("Overlap = " + windowOverlap);
-		
 		int sampsWritten = samplesPerWindow;
 		while(iter.hasNext() && sampsWritten<samp2){
 			float[][] nextWin = iter.next();
