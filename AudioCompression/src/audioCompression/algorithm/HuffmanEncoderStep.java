@@ -11,6 +11,7 @@ public class HuffmanEncoderStep implements AlgorithmStep<AudioByteBuffer, AudioB
 	public AudioByteBuffer forward(AudioByteBuffer input, String name) {
 		// TODO Auto-generated method stub
 		return input;
+
 	}
 
 	@Override

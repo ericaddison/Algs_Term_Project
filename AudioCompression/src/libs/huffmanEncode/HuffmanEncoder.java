@@ -5,6 +5,7 @@
  * https://www.nayuki.io/page/reference-huffman-coding
  * https://github.com/nayuki/Reference-Huffman-coding
  */
+package libs.huffmanEncode;
 
 import java.io.IOException;
 import java.util.List;
@@ -48,7 +49,7 @@ public final class HuffmanEncoder {
 	 * @throws NullPointerException if the current code tree is {@code null}
 	 * @throws IllegalArgumentException if the symbol value is negative or has no binary code
 	 */
-	public void write(int symbol) throws IOException {
+	public void write(int symbol) {
 		if (codeTree == null)
 			throw new NullPointerException("Code tree is null");
 		List<Integer> bits = codeTree.getCode(symbol);

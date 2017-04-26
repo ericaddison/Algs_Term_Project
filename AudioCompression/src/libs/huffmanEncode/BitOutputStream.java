@@ -5,9 +5,10 @@
  * https://www.nayuki.io/page/reference-huffman-coding
  * https://github.com/nayuki/Reference-Huffman-coding
  */
+package libs.huffmanEncode;
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.util.Objects;
 
 
@@ -22,7 +23,7 @@ public final class BitOutputStream {
 	/* Fields */
 	
 	// The underlying byte stream to write to (not null).
-	private OutputStream output;
+	private ByteBuffer output;
 	
 	// The accumulated bits for the current byte, always in the range [0x00, 0xFF].
 	private int currentByte;
@@ -39,7 +40,7 @@ public final class BitOutputStream {
 	 * @param in the byte output stream
 	 * @throws NullPointerException if the output stream is {@code null}
 	 */
-	public BitOutputStream(OutputStream out) {
+	public BitOutputStream(ByteBuffer out) {
 		Objects.requireNonNull(out);
 		output = out;
 		currentByte = 0;
@@ -55,13 +56,13 @@ public final class BitOutputStream {
 	 * @param b the bit to write, which must be 0 or 1
 	 * @throws IOException if an I/O exception occurred
 	 */
-	public void write(int b) throws IOException {
+	public void write(int b) {
 		if (b != 0 && b != 1)
 			throw new IllegalArgumentException("Argument must be 0 or 1");
 		currentByte = (currentByte << 1) | b;
 		numBitsFilled++;
 		if (numBitsFilled == 8) {
-			output.write(currentByte);
+			output.put((byte)currentByte);
 			currentByte = 0;
 			numBitsFilled = 0;
 		}
@@ -72,12 +73,11 @@ public final class BitOutputStream {
 	 * Closes this stream and the underlying output stream. If called when this
 	 * bit stream is not at a byte boundary, then the minimum number of "0" bits
 	 * (between 0 and 7 of them) are written as padding to reach the next byte boundary.
-	 * @throws IOException if an I/O exception occurred
 	 */
-	public void close() throws IOException {
+	public void close() {
 		while (numBitsFilled != 0)
 			write(0);
-		output.close();
+		output.flip(); //sets the buffer to be read
 	}
 	
 }

@@ -7,3 +7,4 @@ bin
 # IntelliJ files
 .idea
 *.iml
+out

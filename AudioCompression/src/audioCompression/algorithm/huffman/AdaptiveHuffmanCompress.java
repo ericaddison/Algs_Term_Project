@@ -1,4 +1,6 @@
-/* 
+package audioCompression.algorithm.huffman;
+
+/*
  * Reference Huffman coding
  * Copyright (c) Project Nayuki
  * 
@@ -14,6 +16,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import libs.huffmanEncode.*;
 
 
 /**

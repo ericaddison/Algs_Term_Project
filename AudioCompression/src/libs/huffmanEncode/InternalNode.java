@@ -1,3 +1,5 @@
+package libs.huffmanEncode;
+
 import java.util.Objects;
 
 /* 

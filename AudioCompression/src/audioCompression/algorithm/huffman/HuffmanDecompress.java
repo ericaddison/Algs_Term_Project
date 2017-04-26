@@ -1,10 +1,14 @@
-/* 
+package audioCompression.algorithm.huffman;
+
+/*
  * Reference Huffman coding
  * Copyright (c) Project Nayuki
  * 
  * https://www.nayuki.io/page/reference-huffman-coding
  * https://github.com/nayuki/Reference-Huffman-coding
  */
+
+import libs.huffmanEncode.*;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

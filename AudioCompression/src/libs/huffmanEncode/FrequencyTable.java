@@ -5,6 +5,7 @@
  * https://www.nayuki.io/page/reference-huffman-coding
  * https://github.com/nayuki/Reference-Huffman-coding
  */
+package libs.huffmanEncode;
 
 import java.util.Objects;
 import java.util.PriorityQueue;
