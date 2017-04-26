@@ -48,7 +48,7 @@ public final class HuffmanDecoder {
 	 * @throws EOFException if the end of stream was reached before a symbol was decoded
 	 * @throws NullPointerException if the current code tree is {@code null}
 	 */
-	public int read() throws IOException {
+	public int read() {
 		if (codeTree == null)
 			throw new NullPointerException("Code tree is null");
 		

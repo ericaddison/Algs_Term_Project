@@ -65,7 +65,7 @@ public final class BitInputStream {
 		if (currentByte == -1)
 			return -1;
 		if (numBitsRemaining == 0) {
-			currentByte = input.get();
+			currentByte = Byte.toUnsignedInt(input.get());
 			if (currentByte == -1)
 				return -1;
 			numBitsRemaining = 8;

@@ -55,7 +55,7 @@ public class HuffmanCompressDemo {
         //try to decompress the output
         // Perform file decompression
         BitInputStream in = new BitInputStream(bbOutput);
-        ByteBuffer bbInput2 = ByteBuffer.allocate(bbInput.capacity() + 1028);
+        ByteBuffer bbInput2 = ByteBuffer.allocate(bbInput.capacity());
 
         try {
             CanonicalCode canonCode2 = readCodeLengthTable(in);
@@ -102,7 +102,7 @@ public class HuffmanCompressDemo {
         HuffmanEncoder enc = new HuffmanEncoder(out);
         enc.codeTree = code;
         while (in.hasRemaining()) {
-            int b = (in.get() & 0xff);
+            int b = Byte.toUnsignedInt(in.get());
             enc.write(b);
         }
         enc.write(256);  // EOF
@@ -125,7 +125,7 @@ public class HuffmanCompressDemo {
         HuffmanDecoder dec = new HuffmanDecoder(in);
         dec.codeTree = code;
         while (in.input.hasRemaining()) {
-            int symbol = in.read();
+            int symbol = dec.read();
             if (symbol == 256)  // EOF symbol //todo again, not sure this is necessary since we aren't reading from a file
                 break;
             out.put((byte)symbol);
