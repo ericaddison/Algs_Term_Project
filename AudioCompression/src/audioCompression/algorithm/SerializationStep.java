@@ -27,6 +27,7 @@ import audioCompression.types.CompressedAudioFile;
 public class SerializationStep implements AlgorithmStep<AudioByteBuffer, CompressedAudioFile> {
 
 	private static final String NAME = "Serializer";
+	private int compressFileSize = 0;
 	
 	@Override
 	public CompressedAudioFile forward(AudioByteBuffer input, String name) {
@@ -39,6 +40,8 @@ public class SerializationStep implements AlgorithmStep<AudioByteBuffer, Compres
 			FileOutputStream strm = new FileOutputStream(file, false); 
 			FileChannel channel = strm.getChannel();
 			fileSize = input.getBuffer().remaining();
+			
+			compressFileSize = fileSize;
 			
 			// Writes a sequence of bytes to this channel from the given buffer.
 			channel.write(input.getBuffer());
@@ -85,6 +88,10 @@ public class SerializationStep implements AlgorithmStep<AudioByteBuffer, Compres
 		}
 		return null;
 	}
+	
+	public int getCompressFileSize() {
+		return compressFileSize;
+	}
 
 	@Override
 	public String getName() {
@@ -100,5 +107,7 @@ public class SerializationStep implements AlgorithmStep<AudioByteBuffer, Compres
 	public Class<? extends AudioCompressionType> getOutputClass() {
 		return CompressedAudioFile.class;
 	}
+	
+	
 
 }

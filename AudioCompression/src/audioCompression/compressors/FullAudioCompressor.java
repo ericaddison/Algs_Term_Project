@@ -43,6 +43,9 @@ public class FullAudioCompressor implements AudioCompressor {
 	/// Create the huffman encoder
 	private HuffmanEncoderStep huffman = new HuffmanEncoderStep();
 	
+	// Create the serialization step
+	private SerializationStep serialStep = new SerializationStep();
+	
 	public FullAudioCompressor()
 	{
 		m_bMDCTEnabled = false;
@@ -52,7 +55,7 @@ public class FullAudioCompressor implements AudioCompressor {
 		pipeline.addStep(fBankStep);
 		pipeline.addStep(subBand_BB);
 		pipeline.addStep(huffman);
-		pipeline.addStep(new SerializationStep());		
+		pipeline.addStep(serialStep);		
 		
 	}
 	
@@ -133,18 +136,37 @@ public class FullAudioCompressor implements AudioCompressor {
 	
 	public void AddMetricTitles(StringBuilder sb)
 	{
-		sb.append("WindowLength,");
-		sb.append("NumSubBands_FilterBank,");
-		sb.append("FilterBankLength,");
-		sb.append("Adaptive Byte Buff,");
+		sb.append("Window Length,");
+		sb.append("Window Overlap,");
+		sb.append("RMS Error,");
+		sb.append("Input Size (kB),");
+		sb.append("Compress File Size,");
 		
-		pipeline.GetMetricTitles(sb);
+		sb.append("FilterBank Num SubBands ,");
+		sb.append("FilterBank Length,");
+		sb.append("Adaptive Byte Buff,");
+	
+		
+		// add other metric "titles" here (always trail with a comma)
+		
+		/// This will add the timer titles from the pipeline
+		pipeline.GetMetricTitles(sb);		
+		
 	}
 	
 	public void AddMetrics(StringBuilder sb)
 	{
 		sb.append(String.valueOf(io.getWindowLength()));
 		sb.append(",");
+		sb.append(String.valueOf(io.getWindowOverlap()));
+		sb.append(",");
+		sb.append(String.valueOf(io.getRmsError()));
+		sb.append(",");
+		sb.append(String.valueOf(io.getInputSize() / 1024));
+		sb.append(",");
+		sb.append(String.valueOf(serialStep.getCompressFileSize()));
+		sb.append(",");
+		
 		sb.append(String.valueOf(fBankStep.getnBands()));
 		sb.append(",");
 		sb.append(String.valueOf(fBankStep.getFilterWindowLength()));
@@ -152,7 +174,15 @@ public class FullAudioCompressor implements AudioCompressor {
 		sb.append(String.valueOf(m_bAdaptiveByteBuffEnabled));
 		sb.append(",");
 		
+		
+		// add other metric values here (always trail with a comma)
+		
+		/// This will add the timers from the pipeline
 		pipeline.GetMetrics(sb);
+		
+		
+		
+		
 	}
 	
 }

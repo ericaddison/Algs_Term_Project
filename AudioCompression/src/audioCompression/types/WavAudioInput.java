@@ -24,7 +24,7 @@ public class WavAudioInput implements RawAudio{
 			this.wavFile = WavFile.openWavFile(inputFile);
 			nSamples = wavFile.getNumFrames();
 			this.byteDepth = (wavFile.getValidBits()+7)/8;
-			
+				
 			this.samplesPerWindow = samplesPerWindow;
 			
 			this.windowOverlap = windowOverlap;
@@ -47,6 +47,15 @@ public class WavAudioInput implements RawAudio{
 	public void writeFile(String filename) {
 		// todo - write out the wav file, this will probably not be used much in this class
 		//  but is here for completeness of the interface.
+	}
+	
+	public long getInputSize() {
+		return getByteDepth() * getNChannels() * getNSamples();
+	}
+	
+	@Override
+	public int getByteDepth() {
+		return byteDepth;
 	}
 	
 	@Override
@@ -165,11 +174,6 @@ public class WavAudioInput implements RawAudio{
 					windowBuffer[i][j] = windowBuffer[i][(j+windowIncrement)];
 		}
 		
-	}
-
-	@Override
-	public int getByteDepth() {
-		return byteDepth;
 	}
 
 }

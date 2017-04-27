@@ -9,7 +9,7 @@ public class WavReaderTest {
 		try
 		{
 			// Open the wav file specified as the first argument
-			WavFile wavFile = WavFile.openWavFile(new File("../src_wavs/ocean_waves.wav"));
+			WavFile wavFile = WavFile.openWavFile(new File("../src_wavs/ocean_waves_L.wav"));
 
 			// Display information about the wav file
 			wavFile.display();
