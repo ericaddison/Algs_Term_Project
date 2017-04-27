@@ -22,7 +22,7 @@ import audioCompression.types.*;
 public class FullAudioCompressor implements AudioCompressor {
 
 	// Pipeline which will hold the various steps
-	private CompressionPipeline pipeline = new CompressionPipeline();
+	private TimedCompressionPipeline pipeline = new TimedCompressionPipeline();
 	
 	// Internal flag for knowing if the MDCT step is currently active
 	private boolean m_bMDCTEnabled;
@@ -137,6 +137,8 @@ public class FullAudioCompressor implements AudioCompressor {
 		sb.append("NumSubBands_FilterBank,");
 		sb.append("FilterBankLength,");
 		sb.append("Adaptive Byte Buff,");
+		
+		pipeline.GetMetricTitles(sb);
 	}
 	
 	public void AddMetrics(StringBuilder sb)
@@ -149,6 +151,8 @@ public class FullAudioCompressor implements AudioCompressor {
 		sb.append(",");
 		sb.append(String.valueOf(m_bAdaptiveByteBuffEnabled));
 		sb.append(",");
+		
+		pipeline.GetMetrics(sb);
 	}
 	
 }

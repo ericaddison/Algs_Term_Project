@@ -62,7 +62,7 @@ public class TimedCompressionPipeline extends CompressionPipeline {
 		bEnableDebugging = enable;
 	}
 	
-	public void GetMetricTitles(StringBuilder sb, boolean mdctEnabled) {
+	public void GetMetricTitles(StringBuilder sb) {
 		sb.append("Comp IO Time (ms),");
 		sb.append("Decomp IO Time (ms),");
 		sb.append("Comp Filter Bank Time (ms),");
@@ -77,7 +77,7 @@ public class TimedCompressionPipeline extends CompressionPipeline {
 		sb.append("Decomp Serialize Time (ms),");
 	}
 	
-	public void GetMetricss(StringBuilder sb) {
+	public void GetMetrics(StringBuilder sb) {
 		double oneMill = 1000000.0;
 		double compT = (double)(compressionIntervalTimes[0] - compressStartTime) / oneMill;
 		double decompT = (double)(decompressIntervalTimes[0] - decompressStartTime) / oneMill;
@@ -92,7 +92,7 @@ public class TimedCompressionPipeline extends CompressionPipeline {
 		for (int i = 1; i < num; ++i) {
 						
 			compT = (double)(compressionIntervalTimes[i] - compressionIntervalTimes[i - 1]) / oneMill;
-			decompT = (double)(decompressIntervalTimes[i] - decompressIntervalTimes[i - 1]) / oneMill;
+			decompT = (double)(decompressIntervalTimes[i - 1] - decompressIntervalTimes[i]) / oneMill;
 			
 			int index = i;
 			if (!m_mdctEnabled && i > 1) {
