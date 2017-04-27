@@ -2,6 +2,7 @@ package audioCompression.algorithm;
 
 import java.nio.ByteBuffer;
 
+import audioCompression.ByteRestrictionAcousticModel;
 import audioCompression.types.AudioByteBuffer;
 import audioCompression.types.AudioCompressionType;
 import audioCompression.types.Lines;
@@ -25,6 +26,9 @@ public class LinesByteBufferizerStep extends ByteBufferizer implements Algorithm
 		int nBands = input.getNBands();
 		int byteDepth = input.getByteDepth();
 		
+		if(model==null)
+			model = new ByteRestrictionAcousticModel(sampleRate, 0, 1/(2.0f*sampleRate));
+		model.setSampleRate(sampleRate);
 		
 		int capacity = 6*(Integer.SIZE/Byte.SIZE)
 				+ nChannels * nBands * nWindows * samplesPerWindow * byteDepth;
@@ -60,7 +64,11 @@ public class LinesByteBufferizerStep extends ByteBufferizer implements Algorithm
 		int nBands = input.getBuffer().getInt();
 		int samplesPerWindow = input.getBuffer().getInt();
 		int byteDepth = input.getBuffer().getInt();
-
+		if(model==null)
+			model = new ByteRestrictionAcousticModel(sampleRate, 0, 1/(2.0f*sampleRate));
+		model.setSampleRate(sampleRate);
+		
+		
 		float[][][][] windows = new float[nChannels][nBands][nWindows][samplesPerWindow];
 		getChanBandWindowSamples(windows, input.getBuffer(), byteDepth);	
 		
