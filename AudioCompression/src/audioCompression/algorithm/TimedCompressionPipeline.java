@@ -4,6 +4,18 @@ import audioCompression.algorithm.CompressionPipeline;
 
 public class TimedCompressionPipeline extends CompressionPipeline {
 
+	// This constant tells how many stages at most to expect
+	private static final int MAX_NUM_STAGES = 6;
+	// this flag indicates if the mdct was present at compress start time (num stages == MAX_NUM_STAGES)
+	private boolean m_mdctEnabled = false;
+	
+	public TimedCompressionPipeline()
+	{
+		/// these arrays assume a step for io, filter bank, MDCT, byte bufferizer, huffman, and serialization 
+		compressionIntervalTimes = new long[MAX_NUM_STAGES];
+		decompressIntervalTimes = new long[MAX_NUM_STAGES];
+	}
+	
 	/**
 	 * This function handles the intermediate steps of the compress and decompress pipeline,
 	 * this provides a handle to capture step specific metrics, ie time etc.
@@ -13,30 +25,23 @@ public class TimedCompressionPipeline extends CompressionPipeline {
 	 * @param nextStage	Name of next stage to be performed
 	 */
 	@Override
-	protected void OnPipelineEvent(PipelineStage stage, int nextIndex, String prevStage, String nextStage)
-	{
+	protected void OnPipelineEvent(PipelineStageType stage, int index, String stageName)
+	{		
 		long curTime = System.nanoTime();
 		String msg = "- Pipeline Event ";
-		if (stage == PipelineStage.STAGE_FORWARD_BEGIN) {
+		if (stage == PipelineStageType.STAGE_COMPRESSION_BEGINNING) {
+			m_mdctEnabled = (pipeline.size() == MAX_NUM_STAGES);
 			compressStartTime = curTime;
-			compressionIntervalTimes = new long[pipeline.size()];
-			msg += "Forward Begin with " + nextStage + " - ";
-		} else if (stage == PipelineStage.STAGE_FORWARD_INTERMEDIATE) {
-			compressionIntervalTimes[nextIndex] = curTime;
-			msg += "Forward Between " + prevStage + " and " + nextStage + " -"; 
-		} else if (stage == PipelineStage.STAGE_FORWARD_END) {
-			compressionIntervalTimes[decompressIntervalTimes.length - 1] = curTime;
-			msg += "Forward Ending -";
-		} else if (stage == PipelineStage.STAGE_REVERSE_BEGIN) {
+			msg += stageName;
+		} else if (stage == PipelineStageType.STAGE_FORWARD_STEP) {
+			compressionIntervalTimes[index] = curTime;
+			msg += "Forward - " + stageName + " has completed -"; 		
+		} else if (stage == PipelineStageType.STAGE_DECOMPRESSION_BEGINNING) {
 			decompressStartTime = curTime;
-			decompressIntervalTimes = new long[pipeline.size()];
-			msg += "Reverse Begin with " + nextStage + " - ";
-		} else if (stage == PipelineStage.STAGE_REVERSE_INTERMEDIATE) {
-			decompressIntervalTimes[nextIndex] = curTime;
-			msg += "Reverse Between " + prevStage + " and " + nextStage + " -"; 
-		} else if (stage == PipelineStage.STAGE_REVERSE_END) {
-			decompressIntervalTimes[decompressIntervalTimes.length - 1] = curTime;
-			msg += "Reverse Ending -";
+			msg += stageName;
+		} else if (stage == PipelineStageType.STAGE_REVERSE_STEP) {
+			decompressIntervalTimes[index] = curTime;
+			msg += "Reverse - " + stageName + " has completed -"; 
 		}
 		if (bEnableDebugging) {
 			msg += "\n";
@@ -58,10 +63,49 @@ public class TimedCompressionPipeline extends CompressionPipeline {
 	}
 	
 	public void GetMetricTitles(StringBuilder sb, boolean mdctEnabled) {
-		
+		sb.append("Comp IO Time (ms),");
+		sb.append("Decomp IO Time (ms),");
+		sb.append("Comp Filter Bank Time (ms),");
+		sb.append("Decomp Filter Bank Time (ms),");
+		sb.append("Comp MDCT Time (ms),");
+		sb.append("Decomp MDCT Time (ms),");
+		sb.append("Comp Byte Bufferizer (ms),");
+		sb.append("Decomp Byte Bufferizer (ms),");
+		sb.append("Comp Huffman Time (ms),");
+		sb.append("Decomp Huffman Time (ms),");
+		sb.append("Comp Serialize Time (ms),");
+		sb.append("Decomp Serialize Time (ms),");
 	}
 	
-	public void GetMetricss(StringBuilder sb, boolean mdctEnabled) {
+	public void GetMetricss(StringBuilder sb) {
+		double oneMill = 1000000.0;
+		double compT = (double)(compressionIntervalTimes[0] - compressStartTime) / oneMill;
+		double decompT = (double)(decompressIntervalTimes[0] - decompressStartTime) / oneMill;
 		
+		double[] compTimes = new double[MAX_NUM_STAGES];
+		double[] decompTimes = new double[MAX_NUM_STAGES];
+		
+		compTimes[0] = compT;
+		decompTimes[0] = decompT;
+		
+		int num = pipeline.size();
+		for (int i = 1; i < num; ++i) {
+						
+			compT = (double)(compressionIntervalTimes[i] - compressionIntervalTimes[i - 1]) / oneMill;
+			decompT = (double)(decompressIntervalTimes[i] - decompressIntervalTimes[i - 1]) / oneMill;
+			
+			int index = i;
+			if (!m_mdctEnabled && i > 1) {
+				index++;
+			}
+			
+			compTimes[index] = compT;
+			decompTimes[index] = decompT;
+		}
+		
+		for (int i = 0; i < MAX_NUM_STAGES; ++i) {
+			sb.append(String.valueOf(compTimes[i]) + ",");
+			sb.append(String.valueOf(decompTimes[i]) + ",");
+		}
 	}
 }
