@@ -5,7 +5,7 @@
  * https://www.nayuki.io/page/reference-huffman-coding
  * https://github.com/nayuki/Reference-Huffman-coding
  */
-package libs.huffmanEncode;
+package audioCompression.algorithm.huffman;
 
 /**
  * A node in a code tree. This class has exactly two subclasses: InternalNode, Leaf.

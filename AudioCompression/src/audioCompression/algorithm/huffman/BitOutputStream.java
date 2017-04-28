@@ -5,7 +5,9 @@
  * https://www.nayuki.io/page/reference-huffman-coding
  * https://github.com/nayuki/Reference-Huffman-coding
  */
-package libs.huffmanEncode;
+package audioCompression.algorithm.huffman;
+
+import audioCompression.algorithm.huffman.BitInputStream;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

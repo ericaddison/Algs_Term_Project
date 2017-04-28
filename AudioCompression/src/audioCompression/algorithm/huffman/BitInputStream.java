@@ -5,12 +5,10 @@
  * https://www.nayuki.io/page/reference-huffman-coding
  * https://github.com/nayuki/Reference-Huffman-coding
  */
-package libs.huffmanEncode;
+package audioCompression.algorithm.huffman;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.Buffer;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.util.Objects;
@@ -101,7 +99,6 @@ public final class BitInputStream {
 	 * @throws IOException if an I/O exception occurred
 	 */
 	public void close() {
-		//input.flip(); //probably unnecessary, just for completeness
 		currentByte = -1;
 		numBitsRemaining = 0;
 	}

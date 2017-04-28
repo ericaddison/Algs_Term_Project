@@ -1,4 +1,4 @@
-package libs.huffmanEncode;
+package audioCompression.algorithm.huffman;
 
 import java.util.Objects;
 

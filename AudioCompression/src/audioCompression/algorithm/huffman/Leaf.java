@@ -5,7 +5,7 @@
  * https://www.nayuki.io/page/reference-huffman-coding
  * https://github.com/nayuki/Reference-Huffman-coding
  */
-package libs.huffmanEncode;
+package audioCompression.algorithm.huffman;
 
 /**
  * A leaf node in a code tree. It has a symbol value. Immutable.
