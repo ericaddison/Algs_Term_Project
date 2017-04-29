@@ -1,0 +1,18 @@
+wav file descriptions
+
+all wav files are 16bit, 44.1kHz, mono files.
+the 2x versions are the exact same sample looped one time.
+
+drumkit				hihat, kickdrum, snaredrum, disco beat
+ep_low				electric piano, mostly bass, longer sample
+hi_low_synth		alternates between high and low freq with "slide" 
+					between notes, may produce artifacts depending on 
+					sample rate or frequency elimination
+hi_piano			piano sample played on upper register
+hihat				hihat only, hi freq
+kickdrum			kickdrum only, low freq
+square_overtones	square waved synth lead, 3rd of triad moves between 2nd, 
+					3rd, and 4th to create audible changes in overtones, 
+					could be affected by elimination of frequencies
+strings				wide, "fuzzy" sample, not as well defined as others
+synth_bass			droning single-octave bass sample 
