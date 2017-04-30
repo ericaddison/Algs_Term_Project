@@ -3,6 +3,8 @@ bin
 .classpath
 .project
 .settings
+output_wavs/
+*.jet
 
 # IntelliJ files
 .idea
