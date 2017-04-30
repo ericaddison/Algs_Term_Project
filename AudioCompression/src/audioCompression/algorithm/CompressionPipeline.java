@@ -17,7 +17,7 @@ import audioCompression.types.AudioCompressionType;
 @SuppressWarnings("rawtypes")
 public class CompressionPipeline {
 
-	private LinkedList<AlgorithmStep> pipeline = new LinkedList<>();
+	protected LinkedList<AlgorithmStep> pipeline = new LinkedList<>();
 	
 	
 	/**
@@ -58,6 +58,37 @@ public class CompressionPipeline {
 	
 	}
 	
+	// These enums describe the pipeline stage for triggering the pipeline callback
+	public enum PipelineStageType {
+		STAGE_COMPRESSION_BEGINNING,
+		STAGE_FORWARD_STEP,
+		STAGE_DECOMPRESSION_BEGINNING,
+		STAGE_REVERSE_STEP,
+	};
+	
+	/**
+	 * This function handles the intermediate steps of the compress and decompress pipeline,
+	 * this provides a handle to capture step specific metrics, ie time etc.
+	 * @param stage		Enum of which part of the cycle is happening, start, middle, end
+	 * @param index		Index of the step which just completed
+	 * @param stageName	Name of the stage which is about to begin or just finished
+	 */
+	protected void OnPipelineEvent(PipelineStageType stage, int index, String stageName)
+	{
+		String msg = "- Pipeline Event ";
+		if (stage == PipelineStageType.STAGE_COMPRESSION_BEGINNING) {
+			msg += stageName;
+		} else if (stage == PipelineStageType.STAGE_FORWARD_STEP) {
+			msg += "Forward - " + stageName + " has completed -"; 
+		} else if (stage == PipelineStageType.STAGE_DECOMPRESSION_BEGINNING) {
+			msg += stageName;
+		} else if (stage == PipelineStageType.STAGE_REVERSE_STEP) {
+			msg += "Reverse - " + stageName + " has completed -"; 
+		}
+		msg += "\n";
+		System.out.printf(msg);
+	}
+	
 	
 	/**
 	 * Process an input dataset through the pipeline in the 
@@ -73,11 +104,18 @@ public class CompressionPipeline {
 					+ "expected " + pipeline.getFirst().getInputClass() 
 					+ ", got " + input.getClass());
 		
+		int stepIndex = 0;
+		// Trigger alert event that pipeline has begun
+		OnPipelineEvent(PipelineStageType.STAGE_COMPRESSION_BEGINNING, stepIndex, "- Compress Starting -");
+				
 		Iterator<AlgorithmStep> iter = pipeline.iterator();
 		AudioCompressionType workingData = input;
+		
 		while(iter.hasNext()){
-			AlgorithmStep nextStep = iter.next(); 
+			AlgorithmStep nextStep = iter.next();
 			workingData = nextStep.forward(workingData, name);
+			OnPipelineEvent(PipelineStageType.STAGE_FORWARD_STEP, stepIndex, nextStep.getName());
+			stepIndex++;
 		}
 		return workingData;
 	}
@@ -97,12 +135,21 @@ public class CompressionPipeline {
 					+ "expected " + pipeline.getLast().getOutputClass() 
 					+ ", got " + input.getClass());
 		
+		int nextIndex = pipeline.size() - 1;
+		
+		// Trigger alert event that pipeline has begun
+		OnPipelineEvent(PipelineStageType.STAGE_DECOMPRESSION_BEGINNING, nextIndex, "- Decompress Starting -");
+				
 		Iterator<AlgorithmStep> iter = pipeline.descendingIterator();
 		AudioCompressionType workingData = input;
 		while(iter.hasNext()){
-			AlgorithmStep nextStep = iter.next(); 
+			AlgorithmStep nextStep = iter.next();
 			workingData = nextStep.reverse(workingData, name);
+			
+			OnPipelineEvent(PipelineStageType.STAGE_REVERSE_STEP, nextIndex, nextStep.getName());
+			nextIndex--;
 		}
+			
 		return workingData;
 	}
 	

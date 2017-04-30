@@ -2,7 +2,8 @@ package audioCompression.compressors;
 
 import audioCompression.algorithm.*;
 import audioCompression.types.CompressedAudioFile;
-import audioCompression.types.RawAudio;
+import audioCompression.types.AudioCompressionType;
+import audioCompression.types.AudioFile;
 
 /**
  * Our implementation of a stripped down version of MP3 compression.
@@ -25,20 +26,21 @@ public class StrippedDownMP3 implements AudioCompressor{
 	public StrippedDownMP3() {
 		pipeline.addStep(new InputOutputStep());
 		pipeline.addStep(new FilterBankStep());
-		pipeline.addStep(new MdctStep());
-		pipeline.addStep(new LinesByteBufferizerStep());
+	//	pipeline.addStep(new MdctStep());
+		pipeline.addStep(new SubbandsByteBufferizerStep());
+	//	pipeline.addStep(new LinesByteBufferizerStep());
 		pipeline.addStep(new HuffmanEncoderStep());
 		pipeline.addStep(new SerializationStep());
 	}
 	
 	@Override
-	public CompressedAudioFile compress(RawAudio rawInput, String compressedName){
+	public CompressedAudioFile compress(AudioCompressionType rawInput, String compressedName){
 		return (CompressedAudioFile) pipeline.processForward(rawInput, compressedName);
 	}
 	
 	@Override
-	public RawAudio decompress(CompressedAudioFile compressedInput, String decompressName){
-		return (RawAudio) pipeline.processReverse(compressedInput, decompressName);
+	public AudioFile decompress(CompressedAudioFile compressedInput, String decompressName){
+		return (AudioFile) pipeline.processReverse(compressedInput, decompressName);
 	}
 	
 }

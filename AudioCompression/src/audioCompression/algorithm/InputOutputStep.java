@@ -14,6 +14,12 @@ public class InputOutputStep implements AlgorithmStep<AudioFile, RawAudio>{
 	private RawAudio inputAudio;
 	private RawAudio outputWav;
 	private float rmsError;
+	private long inputSize;
+	
+	// retrieve the input file size in bytes?
+	public long getInputSize() {
+		return inputSize;
+	}
 	
 	public int getWindowLength() {
 		return windowLength;
@@ -45,7 +51,9 @@ public class InputOutputStep implements AlgorithmStep<AudioFile, RawAudio>{
 
 	@Override
 	public RawAudio forward(AudioFile input, String name) {
-		inputAudio = new WavAudioInput(new File(input.getFilename()), windowLength, windowOverlap);
+		WavAudioInput wav = new WavAudioInput(new File(input.getFilename()), windowLength, windowOverlap); 
+		inputAudio = wav;
+		inputSize = wav.getInputSize();
 		return inputAudio;
 	}
 

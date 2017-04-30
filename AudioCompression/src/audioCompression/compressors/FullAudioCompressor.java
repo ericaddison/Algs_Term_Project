@@ -22,7 +22,7 @@ import audioCompression.types.*;
 public class FullAudioCompressor implements AudioCompressor {
 
 	// Pipeline which will hold the various steps
-	private CompressionPipeline pipeline = new CompressionPipeline();
+	private TimedCompressionPipeline pipeline = new TimedCompressionPipeline();
 	
 	// Internal flag for knowing if the MDCT step is currently active
 	private boolean m_bMDCTEnabled;
@@ -43,6 +43,9 @@ public class FullAudioCompressor implements AudioCompressor {
 	/// Create the huffman encoder
 	private HuffmanEncoderStep huffman = new HuffmanEncoderStep();
 	
+	// Create the serialization step
+	private SerializationStep serialStep = new SerializationStep();
+	
 	public FullAudioCompressor()
 	{
 		m_bMDCTEnabled = false;
@@ -52,18 +55,18 @@ public class FullAudioCompressor implements AudioCompressor {
 		pipeline.addStep(fBankStep);
 		pipeline.addStep(subBand_BB);
 		pipeline.addStep(huffman);
-		pipeline.addStep(new SerializationStep());		
+		pipeline.addStep(serialStep);		
 		
 	}
 	
 	@Override // compress the given input file
-	public CompressedAudioFile compress(RawAudio rawInput, String compressedName) {
-		return (CompressedAudioFile) pipeline.processForward(rawInput, compressedName);
+	public CompressedAudioFile compress(AudioCompressionType input, String compressedName) {
+		return (CompressedAudioFile) pipeline.processForward(input, compressedName);
 	}
 
 	@Override // decompress the given input file
-	public RawAudio decompress(CompressedAudioFile compressedInput, String decompressName) {
-		return (RawAudio) pipeline.processReverse(compressedInput, decompressName);
+	public AudioFile decompress(CompressedAudioFile compressedInput, String decompressName) {
+		return (AudioFile) pipeline.processReverse(compressedInput, decompressName);
 	}
 
 	// Method for toggling the adaptive encoding of the Huffman Step
@@ -130,5 +133,56 @@ public class FullAudioCompressor implements AudioCompressor {
 	{
 		io.setWindowLength(winSize);
 	}
+	
+	public void AddMetricTitles(StringBuilder sb)
+	{
+		sb.append("Window Length,");
+		sb.append("Window Overlap,");
+		sb.append("RMS Error,");
+		sb.append("Input Size (kB),");
+		sb.append("Compress File Size,");
 		
+		sb.append("FilterBank Num SubBands ,");
+		sb.append("FilterBank Length,");
+		sb.append("Adaptive Byte Buff,");
+	
+		
+		// add other metric "titles" here (always trail with a comma)
+		
+		/// This will add the timer titles from the pipeline
+		pipeline.GetMetricTitles(sb);		
+		
+	}
+	
+	public void AddMetrics(StringBuilder sb)
+	{
+		sb.append(String.valueOf(io.getWindowLength()));
+		sb.append(",");
+		sb.append(String.valueOf(io.getWindowOverlap()));
+		sb.append(",");
+		sb.append(String.valueOf(io.getRmsError()));
+		sb.append(",");
+		sb.append(String.valueOf(io.getInputSize() / 1024));
+		sb.append(",");
+		sb.append(String.valueOf(serialStep.getCompressFileSize()));
+		sb.append(",");
+		
+		sb.append(String.valueOf(fBankStep.getnBands()));
+		sb.append(",");
+		sb.append(String.valueOf(fBankStep.getFilterWindowLength()));
+		sb.append(",");
+		sb.append(String.valueOf(m_bAdaptiveByteBuffEnabled));
+		sb.append(",");
+		
+		
+		// add other metric values here (always trail with a comma)
+		
+		/// This will add the timers from the pipeline
+		pipeline.GetMetrics(sb);
+		
+		
+		
+		
+	}
+	
 }

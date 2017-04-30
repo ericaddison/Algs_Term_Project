@@ -4,33 +4,35 @@ import java.io.File;
 
 import libs.wavParser.WavFile;
 import audioCompression.compressors.StrippedDownMP3;
+import audioCompression.compressors.FullAudioCompressor;
 
 public class FileCompressDemo {
-
-//	private StrippedDownMP3 pipeline;
 	
+	protected FullAudioCompressor fComp = new FullAudioCompressor();
 	
 	public static void RunTest(File file)
 	{
 		StrippedDownMP3 pipeline = new StrippedDownMP3();
 		
+		AudioFile aFile = new AudioFile(file.getPath());
+		
 		/// This doesn't appear to work.  The StrippedDownMP3 expects RawAudio not WavAudio
-		WavAudioInput wav = new WavAudioInput(file, 48000/32, 0);
+		//WavAudioInput wav = new WavAudioInput(file, 48000/32, 0);
 		long startTime = System.nanoTime();
-		CompressedAudioFile out = pipeline.compress(wav, "name_compressed.jet");
+		CompressedAudioFile out = pipeline.compress(aFile, "name_compressed.jet");
 		
 		System.out.println("Output string should be [ name_compressed.jet ] and actually was [ " + out.GetCompressedFilename() + " ]");
 		
 		
 		long midTime = System.nanoTime();
-		RawAudio wavOut = pipeline.decompress(out, "name_decompressed.wav");
+		AudioFile wavOut = pipeline.decompress(out, "name_decompressed.wav");
 	
 		long endTime = System.nanoTime();
 		
-		long compressTime = midTime - startTime;
-		long decompressTime = endTime - midTime;
+		double compressTime = (double)(midTime - startTime) / 1000000.0;
+		double decompressTime = (double)(endTime - midTime) / 1000000.0;
 		
-		System.out.println("Compression Time of " + file.getName() + " was " + String.valueOf(compressTime) + " and decompress Time was " + String.valueOf(decompressTime));
+		System.out.println("Compression Time of " + file.getName() + " was " + String.valueOf(compressTime) + " (ms) and decompress Time was " + String.valueOf(decompressTime) + " (ms)");
 		
 	}
 	
