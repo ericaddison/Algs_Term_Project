@@ -50,21 +50,46 @@ public class FullCompressionDemo {
 	        compressor.AddMetricTitles(sb);
 	        sb.append("Total Compression time (ms), Total Decompression time (ms),");
 	        sb.append('\n');
+	        
+	        boolean enableDebug = true;
 						
+	        compressor.EnableDebugging(enableDebug);
 			for (File file: files) {
 				String name = file.getName();
 				if (name.matches("^(.*wav)")) {
-					System.out.println("Loading wav file: " + name + "\n");
-									
+					System.out.println("Loading wav file: " + name + " - running tests ...");
 					/// do loops in here, to modify the settings on the compressor
-					
-					int windowLen = 256;
-					for (int i = 0; i < 5; ++i) {
-						System.out.println("Running test with Window size of " + String.valueOf(windowLen) + "\n");
-						compressor.SetSignalWindowSize(windowLen);
-						RunCompressDecompress(file, sb);				
-						windowLen *= 2;
+					compressor.EnableMDCTStep(false);
+					System.out.println("Running Tests with MDCT Disabled...\n");
+					for (int mdct = 0; mdct < 2; ++mdct) {
+						System.out.println("Running Tests with Byte Bufferizer Disabled...");
+						compressor.EnableAdaptiveByteBufferizer(false);
+						for (int bb = 0; bb < 2; ++bb) {
+							// run the compress - decompress with adaptive encoding off, then run with it enabled
+							System.out.println("Running Tests with Huffman Adaptive Encoding Enabled...");
+							compressor.EnableHuffmanAdaptiveEncoding(true);
+							for (int h = 0; h < 2; ++h) {
+								int windowLen = 256;
+								for (int i = 0; i < 5; ++i) {
+									System.out.println("Running test with Window size of " + String.valueOf(windowLen) + "\n");
+									compressor.SetSignalWindowSize(windowLen);
+									RunCompressDecompress(file, sb);				
+									windowLen *= 2;
+								}
+								// now enable huffman encoding
+								compressor.EnableHuffmanAdaptiveEncoding(false);
+								System.out.println("Running Tests with Huffman Adaptive Encoding Disabled...");
+							}
+							// now enable adaptive byte bufferizer
+							compressor.EnableAdaptiveByteBufferizer(true);
+							System.out.println("Running Tests with Byte Bufferizer Enabled...");
+						}						
+						// now enable mdct step and re-run the loops
+						compressor.EnableMDCTStep(true);
+						System.out.println("Running Tests with MCDT Enabled...");
 					}
+					
+					System.out.println("Finished running tests on wav file: " + name + "\n-----------------------------------------------------\n");
 				}
 			}
 			

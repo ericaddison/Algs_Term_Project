@@ -68,13 +68,17 @@ public class FullAudioCompressor implements AudioCompressor {
 	public AudioFile decompress(CompressedAudioFile compressedInput, String decompressName) {
 		return (AudioFile) pipeline.processReverse(compressedInput, decompressName);
 	}
+	
+	public void EnableDebugging(boolean enable) {
+		pipeline.SetDebuggingEnable(enable);
+	}
 
 	// Method for toggling the adaptive encoding of the Huffman Step
 	//  if enable is false, single pass encoding will be used
-	public void EnableAdaptiveEncoding(boolean enable)
+	public void EnableHuffmanAdaptiveEncoding(boolean enable)
 	{
 		// do stuff to the Huffman encoder to enable the adaptive encoding
-		// huffman.enableAdaptiveEncoding(enable);
+		huffman.setAdaptive(enable);
 	}
 	
 	// Method for enabling / disabling the MDCT step
@@ -145,7 +149,7 @@ public class FullAudioCompressor implements AudioCompressor {
 		sb.append("FilterBank Num SubBands ,");
 		sb.append("FilterBank Length,");
 		sb.append("Adaptive Byte Buff,");
-	
+		sb.append("Huffman (Adaptive),");
 		
 		// add other metric "titles" here (always trail with a comma)
 		
@@ -172,6 +176,8 @@ public class FullAudioCompressor implements AudioCompressor {
 		sb.append(String.valueOf(fBankStep.getFilterWindowLength()));
 		sb.append(",");
 		sb.append(String.valueOf(m_bAdaptiveByteBuffEnabled));
+		sb.append(",");
+		sb.append(huffman.isAdaptive());
 		sb.append(",");
 		
 		
