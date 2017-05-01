@@ -1,0 +1,50 @@
+##Polyphase Filter Bank
+The first stage in the our compression pipeline is a polyphase fitler bank, as is typical with modern audio compression schemes **reference**. The main objective of the filter bank is to enable multi-rate processing. That is, to process separate frequency bands of a signal differently. Typically, a psycho-acoustic model is applied to the data which can process each frequency band differently.
+
+** picture here **
+
+The filter bank splits the incoming signal into a specified number of frequency bands by applying filters of constant bandwidth and increasing central frequency. These filters are all derived from a single prototype filter by modulating (i.e. shifting in frequency) them to the appropriate central frequency. Time domain filtering is performed in order to avoid the subtleties involved with frequency domain filtering: time-domain signal wrap-around for example.
+
+After the filtering operation has been performed, the resulting subband signals can be modulated down to zero Hertz, then decimated by a factor of Nbands. This resuts in no additional samples being created by the filter bank. Ideally, the decimation will result in no loss of signal fidelity since the filtering has left each subband with a limited bandwidth. In practice, however, this depends on the quality of the prototype filter. Use of the Noble Identities **reference** allows the order of decimation and filtering to be reversed, resulting in significant computational savings: since time filtering is an N^2 operation, it is more efficient to filter a set of decimated signals than it is to filter one long signal.
+
+In the reverse direction, essentially the same thing happens. Each filtered, modulated, and decimated subband signal is first remodulated to its original central frequency, then filtered to prevent alliasing, and finally upsampled to restore the original sample rate. The restored subband signals are summed to produce a reconstructed signal. The reverse operation can be very nearly lossless for a special class of filters known as Pseudo Quadrature Mirror Filters (PQMF). Construction of these filters rely on optimization techniques, however, and are beyond the scope of this project. For our rudimentary compression scheme, we accept some amount of signal distortion due to a low quality prototype filter.
+
+- Tradeoffs
+Multiple parameters have associated tradeoffs in the filter bank. The length of the incoming signal windows affects the run time, as longer windows increase the processing time over multiple short windows. However, longer window times allow for effective use of longer filters, which improve signal fidelity. 
+
+The number of subbands also represents a tradeoff: more subbands results in finer frequency division and allows more sophisticated multi-rate processing to be applied, however the effects of narrow-band filtering (e.g. aliasing and imperfect reconstruction) become more evident with a larger number of subbands.
+
+Design of the prototype filter presents a tradeoff. Specialized filters can be designed that contain desirable properties for audio processing, but this requires careful design choices, possibly optimization techniques, audio domain knowledge, and experience. On the other hand, a generic lowpass filter can be generated quite quickly, which is sufficient for our needs and timeline. The run time of filter application does not depend on the complexity of the filter design, only on the final length of the filter, so the tradeoff is really between design effort and filter quality.
+
+- Complexity
+N_win*decimated_window_size
+
+## Modified Discrete Cosine Transform
+The Modified Discrete Cosine Transform (MDCT) is a Fourier related transform that takes the subbands produced by the fitler bank and splits them into even finer frequency divisions. 
+
+The complexity of a naive MDCT implenentation is O(N^2), though some pre- and post-processing of an FFT can be performed to achieve O(NlgN) performance. 
+
+The purpose of the MDCT is to apply sophisticated psycho-acoustic modelling, for example attenuating energy in neighboring frequencies that are too close for human ears to identify. 
+
+Our very simplistic psycho-acoustic model does not incorporate such advanced techniques. As such, we have included a naive implementation of the MDCT for completness, but do not expect any increase in performance, quality, or compression.
+
+
+## Byte Bufferizers
+You can coarsely categorize the stages of our pipeline as either signal processing steps (filtering, functional transforms) or byte related steps (Huffman encoding, serialization). In order to move from one domain to the other, explicit steps were created to take the float based audio data and convert it to a collection of bytes. We refer to these steps as ByteBufferizers.
+
+The ByteBufferizer steps represent the transition from meaningful audio signals into generic bytes. Accoringly, this step must carefully pack all of the information required for audio reconstruction, to be recovered during the reverse processing step. This step essentially takes the audio data stream, along with a small collection of meta data (sample rate, number of channels, window size, etc), and stuffs it all into a byte buffer. The resulting byte buffer can then be passed along to the byte related processing steps, which need know nothing about the audio/signal side of the pipeline.
+
+* adaptive
+The audio samples we work with are constrained to lie within the range from [-1.0, 1.0]. Our initial approach to byte-ifying our samples was to (explain float-to-bytes here, show eqn)...
+We can gain additional accuracy in our byte-ification if, instead of keeping fixed minimum and maximum values, we scan each window of data, identify the local min/max, store the new local min/max values in the byte buffer, and use them to byte-ify each sample within the window. For sections of the audio stream that do not make use of the full dynamic range, this can result in increased accuracy. The tradeoff is that we must store two additional values per window for use during the reverse processing step. 
+
+
+## Psycho-Acoustic Model
+The Psycho-Acoustic Model is where most modern audio compressors (notably MP3) realize the biggest compression gains. Advanced models exploit various aspects of human physiology and aural perception to determine how much of a signal can be safely removed or stored with a reduced number of bits without adversely affecting the reconstructed audio. Some of the these pereption apsects include frequency masking, where a strong signal at one frequency can render a weaker signal at a nearby frequency inaudible, or similarly, temporal masking, where a loud sound at one instant in time can mask over a subsequent quiet sound.
+
+Our simple model performs one task: given lower and upper frequencies to define an effective "passband", reduce the sample precision (byte depth) of the samples from the subbands with frequencies that lie outside of passband range **picture here**. For example, if we define a passband from 200Hz-10000Hz, then our psycho-acoustic model will instruct the appropriate byte bufferizer to store samples from the subbands below 200Hz and above 10000Hz with reduced precision. The reduced-precision samples can still represent the full dynamic range of the input, but in a less granular fashion. The motivation behind this simple model is that human hearing is most sensitive to frequencies in a certain range, so for singal from frequencies outside of that sensitive range, our perception of the reconstruced sound may not suffer noticably from the lack of precision.
+
+
+*** Notes
+data structures: hmmmm, none really :/ linked list for the pipeline!
+algorithmic stuff
