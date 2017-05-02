@@ -60,10 +60,10 @@ public class FullCompressionDemo {
 			        sb.append('\n');
 					
 					/// do loops in here, to modify the settings on the compressor
-					for (int mdct = 0; mdct < 2; ++mdct) {
-						boolean useMDCT = (mdct==0);
-						System.out.println("Running Tests with MDCT set to " + useMDCT + "...");
-						compressor.EnableMDCTStep(useMDCT);
+					//for (int mdct = 0; mdct < 2; ++mdct) {
+						//boolean useMDCT = (mdct==0);
+						//System.out.println("Running Tests with MDCT set to " + useMDCT + "...");
+						//compressor.EnableMDCTStep(useMDCT);
 						
 						compressor.EnableAdaptiveByteBufferizer(false);
 						for (int bb = 0; bb < 2; ++bb) {
@@ -98,7 +98,7 @@ public class FullCompressionDemo {
 								} // END subbands loop
 							} // END adaptive Huffman loop
 						} // END adaptive byte bufferizer loop
-					} // END MDCT loop
+					//} // END MDCT loop
 					
 					pw.write(sb.toString());
 					pw.close();	
