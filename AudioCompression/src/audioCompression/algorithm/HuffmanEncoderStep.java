@@ -78,7 +78,7 @@ public class HuffmanEncoderStep implements AlgorithmStep<AudioByteBuffer, AudioB
         }
 
         if (adaptive) {
-        	System.out.println("Huffman reverse adaptive");
+        	//System.out.println("Huffman reverse adaptive");
             try {
                 decompress(in, bbOutput);
             } finally {
@@ -88,17 +88,17 @@ public class HuffmanEncoderStep implements AlgorithmStep<AudioByteBuffer, AudioB
 
         }
         else {
-        	System.out.println("Huffman reverse NOT adaptive");
+        	//System.out.println("Huffman reverse NOT adaptive");
             try {
-            	System.out.println("Huffman reverse pre-readCodeLengthTable");
+            	//System.out.println("Huffman reverse pre-readCodeLengthTable");
                 CanonicalCode canonCode = readCodeLengthTable(in);
-                System.out.println("Huffman reverse pre-canonCode - toCodeTree");
+               // System.out.println("Huffman reverse pre-canonCode - toCodeTree");
                 CodeTree code = canonCode.toCodeTree();
-                System.out.println("Huffman reverse pre-decompress");
+                //System.out.println("Huffman reverse pre-decompress");
                 decompress(code, in, bbOutput);
-                System.out.println("Huffman reverse finishted...");
+               // System.out.println("Huffman reverse finishted...");
             } finally {
-            	System.out.println("Huffman reverse finally");
+            	//System.out.println("Huffman reverse finally");
                 in.close();
                 bbOutput.flip();
             }

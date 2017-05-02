@@ -42,22 +42,23 @@ public class FullCompressionDemo {
 	{
 		try 
 		{
-			// Create a csv file for logging the metric data
-			PrintWriter pw = new PrintWriter(new File("../data/test1_data.csv"));
-	        StringBuilder sb = new StringBuilder();
-	        
-	        sb.append("original filename,compressed name,");
-	        compressor.AddMetricTitles(sb);
-	        sb.append("Total Compression time (ms), Total Decompression time (ms),");
-	        sb.append('\n');
-	        
-	        boolean enableDebug = true;
-						
+	        boolean enableDebug = false;
+			int itest=0;			
 	        compressor.EnableDebugging(enableDebug);
 			for (File file: files) {
 				String name = file.getName();
 				if (name.matches("^(.*wav)")) {
 					System.out.println("Loading wav file: " + name + " - running tests ...");
+					
+					// Create a csv file for logging the metric data
+					PrintWriter pw = new PrintWriter(new File("../data/"+name+"_data.csv"));
+			        StringBuilder sb = new StringBuilder();
+			        
+			        sb.append("original filename,compressed name,");
+			        compressor.AddMetricTitles(sb);
+			        sb.append("Total Compression time (ms), Total Decompression time (ms),");
+			        sb.append('\n');
+					
 					/// do loops in here, to modify the settings on the compressor
 					compressor.EnableMDCTStep(false);
 					System.out.println("Running Tests with MDCT Disabled...\n");
@@ -68,25 +69,29 @@ public class FullCompressionDemo {
 							// run the compress - decompress with adaptive encoding off, then run with it enabled
 							System.out.println("Running Tests with Huffman Adaptive Encoding Enabled...");
 							compressor.EnableHuffmanAdaptiveEncoding(true);
-							for(int ibands=2; ibands<32; ibands*=2){
-								System.out.println("Running test with nBands = " + ibands);
-								compressor.SetNumberOfSubBands(ibands);
-								for(int filterLen=256; filterLen<=4096; filterLen*=2){
-									System.out.println("Running test with filter length = " + filterLen);
-									compressor.SetFilterBankLength(filterLen);
-									for (int h = 0; h < 2; ++h) {
-										int windowLen = 256;
-										for (int i = 0; i < 5; ++i) {
-											System.out.println("Running test with Window size of " + String.valueOf(windowLen) + "\n");
-											compressor.SetSignalWindowSize(windowLen);
-											RunCompressDecompress(file, sb);				
-											windowLen *= 2;
+							for(int hadapt=0; hadapt<2; hadapt++){
+								for(int ibands=2; ibands<32; ibands*=2){
+									System.out.println("Running test with nBands = " + ibands);
+									compressor.SetNumberOfSubBands(ibands);
+									for(int filterLen=256; filterLen<=4096; filterLen*=2){
+										System.out.println("Running test with filter length = " + filterLen);
+										compressor.SetFilterBankLength(filterLen);
+										for (int h = 0; h < 5; ++h) {
+											int windowLen = 256;
+											for (int i = 0; i < 5; ++i) {
+												System.out.println("Running test with Window size of " + String.valueOf(windowLen) + "\n");
+												compressor.SetSignalWindowSize(windowLen);
+												
+												System.out.println("Running test " + (++itest));
+												RunCompressDecompress(file, sb);				
+												windowLen *= 2;
+											}
 										}
-										// now enable huffman encoding
-										compressor.EnableHuffmanAdaptiveEncoding(false);
-										System.out.println("Running Tests with Huffman Adaptive Encoding Disabled...");
 									}
 								}
+								// now enable huffman encoding
+								compressor.EnableHuffmanAdaptiveEncoding(false);
+								System.out.println("Running Tests with Huffman Adaptive Encoding Disabled...");
 							}
 							// now enable adaptive byte bufferizer
 							compressor.EnableAdaptiveByteBufferizer(true);
@@ -97,12 +102,12 @@ public class FullCompressionDemo {
 						System.out.println("Running Tests with MCDT Enabled...");
 					}
 					
+					pw.write(sb.toString());
+					pw.close();	
 					System.out.println("Finished running tests on wav file: " + name + "\n-----------------------------------------------------\n");
 				}
 			}
 			
-			pw.write(sb.toString());
-			pw.close();			
 			
 		}
 		catch (Exception e)
