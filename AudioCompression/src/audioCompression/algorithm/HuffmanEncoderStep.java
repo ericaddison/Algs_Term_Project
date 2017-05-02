@@ -14,8 +14,9 @@ public class HuffmanEncoderStep implements AlgorithmStep<AudioByteBuffer, AudioB
 
 	private static final String NAME = "Huffman Encoder";
 
-	//todo make the adaptive stuff work
-    protected boolean adaptive = false;
+	private int bufferSize = 0;
+
+	protected boolean adaptive = false;
 
     public boolean isAdaptive() {
         return adaptive;
@@ -30,7 +31,8 @@ public class HuffmanEncoderStep implements AlgorithmStep<AudioByteBuffer, AudioB
 	public AudioByteBuffer forward(AudioByteBuffer input, String name) {
 
         ByteBuffer bbInput = input.getBuffer();
-        ByteBuffer bbOutput = ByteBuffer.allocate(bbInput.capacity() + 1028);
+        bufferSize = bbInput.capacity();
+        ByteBuffer bbOutput = ByteBuffer.allocate(bufferSize + 1028);
         BitOutputStream out = new BitOutputStream(bbOutput);
 
         if (adaptive) {
@@ -67,7 +69,13 @@ public class HuffmanEncoderStep implements AlgorithmStep<AudioByteBuffer, AudioB
 	public AudioByteBuffer reverse(AudioByteBuffer input, String name) {
 
         BitInputStream in = new BitInputStream(input.getBuffer());
-        ByteBuffer bbOutput = ByteBuffer.allocate(input.getBuffer().capacity());
+        ByteBuffer bbOutput;
+
+        if (bufferSize == 0) {
+            bbOutput = ByteBuffer.allocate(input.getBuffer().capacity() + 1028);
+        } else {
+            bbOutput = ByteBuffer.allocate(bufferSize);
+        }
 
         if (adaptive) {
             try {
