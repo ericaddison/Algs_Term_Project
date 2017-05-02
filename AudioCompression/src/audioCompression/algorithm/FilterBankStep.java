@@ -36,8 +36,7 @@ public class FilterBankStep implements AlgorithmStep<RawAudio, Subbands> {
 		Iterator<float[][]> iter = input.getWindowIterator();
 		int windowCount = 0;
 		Subbands subbands = new Subbands(input, nBands);
-		if(filterBank==null)
-			filterBank = new CosineModulatedFilterBank(nBands, w);
+		filterBank = new CosineModulatedFilterBank(nBands, w);
 		
 		while(iter.hasNext()){
 			
