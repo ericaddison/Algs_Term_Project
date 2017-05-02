@@ -143,13 +143,14 @@ public class FullAudioCompressor implements AudioCompressor {
 		sb.append("Window Length,");
 		sb.append("Window Overlap,");
 		sb.append("RMS Error,");
-		sb.append("Input Size (kB),");
+		sb.append("Input Size,");
 		sb.append("Compress File Size,");
+		sb.append("Compression Ratio,");
 		
 		sb.append("FilterBank Num SubBands ,");
 		sb.append("FilterBank Length,");
 		sb.append("Adaptive Byte Buff,");
-		sb.append("Huffman (Adaptive),");
+	
 		
 		// add other metric "titles" here (always trail with a comma)
 		
@@ -166,9 +167,11 @@ public class FullAudioCompressor implements AudioCompressor {
 		sb.append(",");
 		sb.append(String.valueOf(io.getRmsError()));
 		sb.append(",");
-		sb.append(String.valueOf(io.getInputSize() / 1024));
+		sb.append(String.valueOf(io.getInputSize()));
 		sb.append(",");
 		sb.append(String.valueOf(serialStep.getCompressFileSize()));
+		sb.append(",");
+		sb.append(String.valueOf(serialStep.getCompressFileSize()/(float)io.getInputSize()));
 		sb.append(",");
 		
 		sb.append(String.valueOf(fBankStep.getnBands()));
@@ -177,17 +180,12 @@ public class FullAudioCompressor implements AudioCompressor {
 		sb.append(",");
 		sb.append(String.valueOf(m_bAdaptiveByteBuffEnabled));
 		sb.append(",");
-		sb.append(huffman.isAdaptive());
-		sb.append(",");
 		
 		
 		// add other metric values here (always trail with a comma)
 		
 		/// This will add the timers from the pipeline
 		pipeline.GetMetrics(sb);
-		
-		
-		
 		
 	}
 	
