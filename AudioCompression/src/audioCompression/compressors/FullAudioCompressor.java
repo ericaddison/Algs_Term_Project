@@ -1,5 +1,6 @@
 package audioCompression.compressors;
 
+import audioCompression.ByteRestrictionAcousticModel;
 import audioCompression.algorithm.*;
 import audioCompression.algorithm.dsp.window.HannWindow;
 import audioCompression.types.*;
@@ -27,6 +28,9 @@ public class FullAudioCompressor implements AudioCompressor {
 	// Internal flag for knowing if the MDCT step is currently active
 	private boolean m_bMDCTEnabled;
 	private boolean m_bAdaptiveByteBuffEnabled;
+	private boolean m_bAdaptiveHuffmanEnabled;
+	private float model_f1 = 0;
+	private float model_f2 = 0;
 	
 	// Create the InputOutput step for the front end of the pipeline
 	private InputOutputStep io = new InputOutputStep();
@@ -49,7 +53,8 @@ public class FullAudioCompressor implements AudioCompressor {
 	public FullAudioCompressor()
 	{
 		m_bMDCTEnabled = false;
-		m_bAdaptiveByteBuffEnabled = false;		
+		m_bAdaptiveByteBuffEnabled = false;
+		m_bAdaptiveHuffmanEnabled = false;
 		
 		pipeline.addStep(io);
 		pipeline.addStep(fBankStep);
@@ -79,6 +84,7 @@ public class FullAudioCompressor implements AudioCompressor {
 	{
 		// do stuff to the Huffman encoder to enable the adaptive encoding
 		huffman.setAdaptive(enable);
+		m_bAdaptiveHuffmanEnabled = enable;
 	}
 	
 	// Method for enabling / disabling the MDCT step
@@ -114,6 +120,7 @@ public class FullAudioCompressor implements AudioCompressor {
 		//  currently in the pipeline
 		lineBB.setAdaptive(enable);
 		subBand_BB.setAdaptive(enable);	
+		m_bAdaptiveByteBuffEnabled = enable;
 	}
 	
 	/// Sets the number of sub bands to be used in the Filter Bank
@@ -138,6 +145,15 @@ public class FullAudioCompressor implements AudioCompressor {
 		io.setWindowLength(winSize);
 	}
 	
+	public void SetPsychoAcousticModelFrequencies(float sampRate, float f1, float f2){
+		this.model_f1 = f1;
+		this.model_f2 = f2;
+		if(f1==0 && f2==0)
+			subBand_BB.setPsychoAcousticModel(null);
+		else	
+			subBand_BB.setPsychoAcousticModel(new ByteRestrictionAcousticModel(sampRate, f1, f2));
+	}
+	
 	public void AddMetricTitles(StringBuilder sb)
 	{
 		sb.append("Window Length,");
@@ -150,6 +166,9 @@ public class FullAudioCompressor implements AudioCompressor {
 		sb.append("FilterBank Num SubBands ,");
 		sb.append("FilterBank Length,");
 		sb.append("Adaptive Byte Buff,");
+		sb.append("Adaptive Huffman,");
+		sb.append("Model f1,");
+		sb.append("Model f2,");
 	
 		
 		// add other metric "titles" here (always trail with a comma)
@@ -179,6 +198,12 @@ public class FullAudioCompressor implements AudioCompressor {
 		sb.append(String.valueOf(fBankStep.getFilterWindowLength()));
 		sb.append(",");
 		sb.append(String.valueOf(m_bAdaptiveByteBuffEnabled));
+		sb.append(",");
+		sb.append(String.valueOf(m_bAdaptiveHuffmanEnabled));
+		sb.append(",");
+		sb.append(String.valueOf(model_f1));
+		sb.append(",");
+		sb.append(String.valueOf(model_f2));
 		sb.append(",");
 		
 		

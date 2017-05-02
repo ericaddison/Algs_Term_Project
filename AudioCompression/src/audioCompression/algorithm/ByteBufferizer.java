@@ -31,7 +31,7 @@ public abstract class ByteBufferizer{
 		int byteCount = 0;
 		for(int ichan = 0; ichan < samples.length; ichan++)
 			for(int iband = 0; iband < samples[ichan].length; iband++){
-				int currentByteDepth = model.getByteDepth(byteDepth, iband, samples[ichan].length);
+				int currentByteDepth = (model==null)?byteDepth:model.getByteDepth(byteDepth, iband, samples[ichan].length);
 				if(currentByteDepth<=0)
 					throw new IllegalStateException("ByteBufferizer: found currentByteDepth==0");
 				
@@ -60,7 +60,7 @@ public abstract class ByteBufferizer{
 	public void getChanBandWindowSamples(float[][][][] samples, ByteBuffer bytes, int byteDepth){
 		for(int ichan = 0; ichan < samples.length; ichan++)
 			for(int iband = 0; iband < samples[ichan].length; iband++){
-				int currentByteDepth = model.getByteDepth(byteDepth, iband, samples[ichan].length);
+				int currentByteDepth = (model==null)?byteDepth:model.getByteDepth(byteDepth, iband, samples[ichan].length);
 				if(currentByteDepth<=0)
 					throw new IllegalStateException("ByteBufferizer: found currentByteDepth==0");
 				

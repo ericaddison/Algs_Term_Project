@@ -9,6 +9,9 @@ import audioCompression.types.CompressedAudioFile;
 
 public class FullCompressionDemo {
 
+	private float[] f1 = new float[]{0, 100, 200, 300};
+	private float[] f2 = new float[]{15000, 12500, 10000, 8000};
+	
 	protected FullAudioCompressor compressor = new FullAudioCompressor();
 	
 	public void RunCompressDecompress(File file, StringBuilder sb)
@@ -73,11 +76,11 @@ public class FullCompressionDemo {
 							
 							// run the compress - decompress with adaptive encoding off, then run with it enabled
 							for(int hadapt=0; hadapt<2; hadapt++){
-								boolean useAdaptiveHuffman = (bb==0);
+								boolean useAdaptiveHuffman = (hadapt==0);
 								System.out.println("Running Tests with Adaptive Huffman set to " + useAdaptiveHuffman + "...");
 								compressor.EnableHuffmanAdaptiveEncoding(useAdaptiveHuffman);
 								
-								for(int ibands=2; ibands<32; ibands*=2){
+								for(int ibands=2; ibands<=32; ibands*=2){
 									System.out.println("Running test with nBands = " + ibands);
 									compressor.SetNumberOfSubBands(ibands);
 									
@@ -90,8 +93,20 @@ public class FullCompressionDemo {
 											System.out.println("Running test with Window size of " + String.valueOf(windowLen) + "\n");
 											compressor.SetSignalWindowSize(windowLen);
 											
-											System.out.println("Running test " + (++itest));
-											RunCompressDecompress(file, sb);				
+											for(int iModel=0; iModel<5; iModel++){
+												if(iModel==0){
+													compressor.SetPsychoAcousticModelFrequencies(0, 0, 0);
+													System.out.println("Running test with no PsychoAcousticModel");
+												}
+												else{
+													compressor.SetPsychoAcousticModelFrequencies(0, f1[iModel-1], f2[iModel-1]);
+													System.out.println("Running test with PsychoAcousticModel " + f1[iModel-1] + " - " + f2[iModel-1]);	
+												}
+												
+												System.out.println("Running test #" + (++itest));
+												RunCompressDecompress(file, sb);				
+												
+											}//END model loop
 											windowLen *= 2;
 										} // END window length loop
 									} // END filter length loop 
@@ -111,6 +126,7 @@ public class FullCompressionDemo {
 		catch (Exception e)
 		{
 			System.err.println(e);
+			e.printStackTrace();
 		}
 	}	
 	
