@@ -60,53 +60,51 @@ public class FullCompressionDemo {
 			        sb.append('\n');
 					
 					/// do loops in here, to modify the settings on the compressor
-					compressor.EnableMDCTStep(false);
-					System.out.println("Running Tests with MDCT Disabled...\n");
 					for (int mdct = 0; mdct < 2; ++mdct) {
-						System.out.println("Running Tests with Adaptive Byte Bufferizer Disabled...");
+						boolean useMDCT = (mdct==0);
+						System.out.println("Running Tests with MDCT set to " + useMDCT + "...");
+						compressor.EnableMDCTStep(useMDCT);
+						
 						compressor.EnableAdaptiveByteBufferizer(false);
 						for (int bb = 0; bb < 2; ++bb) {
+							boolean useAdaptiveBB = (bb==0);
+							System.out.println("Running Tests with Adaptive Byte Bufferizer set to " + useAdaptiveBB + "...");
+							compressor.EnableAdaptiveByteBufferizer(useAdaptiveBB);
+							
 							// run the compress - decompress with adaptive encoding off, then run with it enabled
-							System.out.println("Running Tests with Huffman Adaptive Encoding Enabled...");
-							compressor.EnableHuffmanAdaptiveEncoding(true);
 							for(int hadapt=0; hadapt<2; hadapt++){
+								boolean useAdaptiveHuffman = (bb==0);
+								System.out.println("Running Tests with Adaptive Huffman set to " + useAdaptiveHuffman + "...");
+								compressor.EnableHuffmanAdaptiveEncoding(useAdaptiveHuffman);
+								
 								for(int ibands=2; ibands<32; ibands*=2){
 									System.out.println("Running test with nBands = " + ibands);
 									compressor.SetNumberOfSubBands(ibands);
+									
 									for(int filterLen=256; filterLen<=4096; filterLen*=2){
 										System.out.println("Running test with filter length = " + filterLen);
 										compressor.SetFilterBankLength(filterLen);
-										for (int h = 0; h < 5; ++h) {
-											int windowLen = 256;
-											for (int i = 0; i < 5; ++i) {
-												System.out.println("Running test with Window size of " + String.valueOf(windowLen) + "\n");
-												compressor.SetSignalWindowSize(windowLen);
-												
-												System.out.println("Running test " + (++itest));
-												RunCompressDecompress(file, sb);				
-												windowLen *= 2;
-											}
-										}
-									}
-								}
-								// now enable huffman encoding
-								compressor.EnableHuffmanAdaptiveEncoding(false);
-								System.out.println("Running Tests with Huffman Adaptive Encoding Disabled...");
-							}
-							// now enable adaptive byte bufferizer
-							compressor.EnableAdaptiveByteBufferizer(true);
-							System.out.println("Running Tests with Adaptive Byte Bufferizer Enabled...");
-						}						
-						// now enable mdct step and re-run the loops
-						compressor.EnableMDCTStep(true);
-						System.out.println("Running Tests with MCDT Enabled...");
-					}
+										
+										int windowLen = 256;
+										for (int i = 0; i < 5; ++i) {
+											System.out.println("Running test with Window size of " + String.valueOf(windowLen) + "\n");
+											compressor.SetSignalWindowSize(windowLen);
+											
+											System.out.println("Running test " + (++itest));
+											RunCompressDecompress(file, sb);				
+											windowLen *= 2;
+										} // END window length loop
+									} // END filter length loop 
+								} // END subbands loop
+							} // END adaptive Huffman loop
+						} // END adaptive byte bufferizer loop
+					} // END MDCT loop
 					
 					pw.write(sb.toString());
 					pw.close();	
 					System.out.println("Finished running tests on wav file: " + name + "\n-----------------------------------------------------\n");
-				}
-			}
+				} // END file match .wav if
+			} // END file loop
 			
 			
 		}
