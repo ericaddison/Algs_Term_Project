@@ -1,7 +1,7 @@
 # Algs_Term_Project
 Term project for the UT Austin ECE course "Algorithmic Foundation for Software Systems"
 
-The goal of this project was to implement, modify, and examine a system of algorithmic components. The primary goal of audio compression depends on the application. An audio compressor can optimize for various qualities, for instance:
+The goal of this project was to implement, modify, and examine a system of algorithmic components. We chose to explore audio compression as a familiar and relevant example of such a system. The primary goal of audio compression depends on the application. An audio compressor can optimize for various qualities, for instance:
 - decompressed sound qualty
 - compression ratio
 - compression time
