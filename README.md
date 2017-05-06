@@ -6,6 +6,7 @@ The goal of this project was to implement, modify, and examine a system of algor
 - compression ratio
 - compression time
 - decompression time.
+
 Frequently, pushing the system to perform well in one of these areas will cause it to suffer in another.
 
 This repository contains our implementation of an MP3-like audio compressor. The processing steps include:
